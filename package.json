@@ -1,22 +1,21 @@
 {
-    "name": "@tfso/AppVeyor",
-    "private": true,
-    "version": "0.0.1",
-    "description": "Tools for AppVeyor",
-    "main": "app.js",
-    "bin": {
-        "patch-version": "bin/patch-version"
-    },
-    "author": {
-        "name": "24SevenOffice"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git://github.com/tfso/appveyor.git"
-    },
-    "dependencies": {},
-    "devDependencies": {
-        "expect": "^1.14.0",
-        "mocha": "^2.4.5"
-    }
+  "name": "@tfso/appveyor",
+  "version": "0.0.1",
+  "description": "Tools for AppVeyor",
+  "main": "app.js",
+  "bin": {
+    "patch-version": "bin/patch-version.js"
+  },
+  "author": {
+    "name": "24SevenOffice"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/tfso/appveyor.git"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "expect": "^1.14.0",
+    "mocha": "^2.4.5"
+  }
 }
