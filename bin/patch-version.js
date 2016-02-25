@@ -16,6 +16,5 @@ function getServiceTag() {
 ;
 var dir = process.argv[2] || process.cwd();
 var version = getServiceTag();
-console.log('Trying to patch version %', version);
 patchVersion(dir, version, console.log, console.error, process.exit);
 //# sourceMappingURL=patch-version.js.map
