@@ -1,4 +1,6 @@
-﻿import patchVersion = require('./../lib/patch-version');
+﻿#!/usr/bin/env node
+
+import patchVersion = require('./../lib/patch-version');
 
 function getServiceTag() {
     var variables  = [
