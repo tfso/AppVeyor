@@ -1,0 +1,50 @@
+﻿# Test against this version of Node.js
+environment:
+  nodejs_version: "0"
+
+branches:
+    only:
+      - master
+
+skip_tags: true
+
+# Install scripts. (runs after repo cloning)
+install:
+  # Get the latest stable version of Node.js or io.js
+  - ps: Install-Product node $env:nodejs_version
+  # install modules
+  - npm install
+  - ps: git config --global user.email "tfsobob@24sevenoffice.com"
+  - ps: git config --global user.name "tfsobob"
+
+build_script:
+  #- npm install -g patch-version
+  #- ps: $env:APPVEYOR_REPO_TAG_NAME = $env:appveyor_build_version # patch-version script uses appveyor_repo_tag_name as version
+  - ps: Write-Host Patching version $env:appveyor_build_version
+  - bin\patch-version
+  
+# Post-install test scripts.
+before_test:
+  # Output useful info for debugging.
+  - node --version
+  - npm --version
+  # install modules needed for testing
+  - npm install -g mocha-appveyor-reporter
+  - npm install -g mocha
+
+test_script:
+  # run tests
+  - mocha --reporter mocha-appveyor-reporter specs/ --no-exit
+
+after_test:
+  - FOR /f %%n IN ('dir .\node_modules /d /b /a:d ^| findstr /R /C:"^[A-Za-z].*$"') DO npm uninstall %%n
+
+artifacts:
+- path: '\'
+  name: tfso.tools.appveyor
+
+deploy_script:
+  - echo scripting to deploy to npm or github releases
+  - git commit -a -m "Modifying version to %appveyor_build_version%"
+  - git tag -a %appveyor_build_version% -m "Release of version %appveyor_build_version%"
+  - git push origin --tags

@@ -34,6 +34,7 @@
   </PropertyGroup>
   <ItemGroup>
     <TypeScriptCompile Include="app.ts" />
+    <Content Include="appveyor.yml" />
     <Content Include="package.json" />
     <Content Include="README.md" />
     <TypeScriptCompile Include="bin\patch-version.ts" />
