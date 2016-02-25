@@ -20,8 +20,8 @@ install:
 build_script:
   #- npm install -g patch-version
   #- ps: $env:APPVEYOR_REPO_TAG_NAME = $env:appveyor_build_version # patch-version script uses appveyor_repo_tag_name as version
-  - ps: Write-Host Patching version $env:appveyor_build_version
-  - bin\patch-version
+  - echo Patching version %appveyor_build_version%
+  - node ./bin/patch-version
   
 # Post-install test scripts.
 before_test:
@@ -34,7 +34,7 @@ before_test:
 
 test_script:
   # run tests
-  - mocha --reporter mocha-appveyor-reporter specs/ --no-exit
+  - mocha --reporter mocha-appveyor-reporter tests/ --no-exit
 
 after_test:
   - FOR /f %%n IN ('dir .\node_modules /d /b /a:d ^| findstr /R /C:"^[A-Za-z].*$"') DO npm uninstall %%n

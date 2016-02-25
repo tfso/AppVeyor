@@ -1,5 +1,5 @@
 {
-  "name": "@tfso/appveyor",
+  "name": "appveyor",
   "version": "0.0.1",
   "description": "Tools for AppVeyor",
   "main": "app.js",
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/tfso/appveyor.git"
+    "url": "git+https://github.com/tfso/appveyor.git"
   },
   "dependencies": {},
   "devDependencies": {
