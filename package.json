@@ -4,7 +4,7 @@
   "description": "Tools for AppVeyor",
   "main": "app.js",
   "bin": {
-    "patch-version": "bin/patch-version"
+    "patch-version": "bin/patch-version.js"
   },
   "author": {
     "name": "24SevenOffice"
