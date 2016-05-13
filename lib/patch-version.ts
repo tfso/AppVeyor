@@ -7,10 +7,7 @@ function patchVersion(dir: string, file: string, version: string, log?: Function
     return fsp
         .readFile(packagePath)
         .then((content: string) => {
-
-            content = content.replace(/\/\*(.|\n)*?\*\//gi, "");
-            content = content.replace(/\/\/.*$/mgi, "");
-
+            content = content.replace(/("(?:(?:\\[^\n]|[^""\n])*)")|\/\*(.|\n)*?\*\/|(?:\/\/.*$)/mgi, "$1");
             var json = JSON.parse(content);
 
             json.version = version;
@@ -28,8 +25,9 @@ function patchVersion(dir: string, file: string, version: string, log?: Function
                 exit(0);
         })
         .catch((exception) => {
-            if (error != null)
-                error(exception.toString());
+            if (error != null) {
+                error(exception);
+            }
 
             if (exit)
                 exit(-1);
