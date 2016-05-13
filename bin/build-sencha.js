@@ -77,4 +77,4 @@ workspace.upgrade()
 //    console.log('STDERR');
 //    console.warn(stderr);
 //}); 
-//# sourceMappingURL=build-extjs.js.map
+//# sourceMappingURL=build-sencha.js.map
