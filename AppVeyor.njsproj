@@ -37,7 +37,7 @@
     <Content Include="appveyor.yml" />
     <Content Include="package.json" />
     <Content Include="README.md" />
-    <TypeScriptCompile Include="bin\build-extjs.ts" />
+    <TypeScriptCompile Include="bin\build-sencha.ts" />
     <TypeScriptCompile Include="bin\patch-version.ts" />
     <TypeScriptCompile Include="lib\appveyor.ts" />
     <TypeScriptCompile Include="lib\fs-promise.ts" />
