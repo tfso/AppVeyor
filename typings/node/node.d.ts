@@ -953,11 +953,21 @@ declare module "fs" {
 }
 
 declare module "path" {
+    export interface PathObject {
+        root: string
+        dir: string
+        base: string
+        ext: string
+        name: string
+    }
+
+    export function isAbsolute(p: string): boolean;
     export function normalize(p: string): string;
     export function join(...paths: any[]): string;
     export function resolve(...pathSegments: any[]): string;
     export function relative(from: string, to: string): string;
     export function dirname(p: string): string;
+    export function parse(p: string): PathObject;
     export function basename(p: string, ext?: string): string;
     export function extname(p: string): string;
     export var sep: string;
