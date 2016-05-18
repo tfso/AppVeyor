@@ -15,7 +15,8 @@
     "url": "git+https://github.com/tfso/appveyor.git"
   },
   "dependencies": {
-    "async": "^2.0.0-rc.4"
+    "async": "^2.0.0-rc.4",
+    "unzip": "^0.1.11"
   },
   "devDependencies": {
     "expect": "^1.14.0",

@@ -1,8 +1,13 @@
 ﻿import path = require('path');
 import fsp = require('../lib/fs-promise');
+import fs = require('fs');
+import os = require('os');
 import proc = require('child_process');
 import events = require('events');
 import async = require('async');
+
+import http = require('http');
+import unzip = require('unzip');
 
 namespace Sencha {
 
@@ -11,9 +16,16 @@ namespace Sencha {
         Application
     }
 
+    export interface IConfiguration {
+        path: string;
+        sdk?: string;
+
+        senchaCmd?: string
+    }
+
     export interface IWorkspace extends NodeJS.EventEmitter {
-        basedir: string
-        sdkdir: string
+        workspace: string
+        sdk: string
 
         getModules(callback?: (err: Error, modules?: Array<Sencha.IModule>) => void): Promise<Array<Sencha.IModule>>
 
@@ -32,14 +44,17 @@ namespace Sencha {
     }
 
     export class Workspace extends events.EventEmitter implements IWorkspace {
-        basedir = ""
-        sdkdir = ""
+        workspace = ""
+        sdk = ""
+        senchaCmd = ""
 
-        constructor(base_directory: string, sdk_directory: string) {
+        constructor(config: IConfiguration) {
             super();
 
-            this.basedir = path.normalize(base_directory);
-            this.sdkdir = path.normalize(sdk_directory);
+            this.workspace = path.normalize(config.path);
+            this.sdk = path.normalize(config.sdk);
+
+            this.senchaCmd = config.senchaCmd;
         }
 
         //output(std: Buffer) {
@@ -66,7 +81,7 @@ namespace Sencha {
         upgrade(callback?: (err: Error) => void) {
             var execute = new Promise((resolve, reject) => {
                 var err,
-                    cmd = proc.spawn('sencha.exe', ['framework', 'upgrade', 'ext', this.sdkdir || "ext"], { cwd: this.basedir, env: [] });
+                    cmd = proc.spawn(this.senchaCmd || 'sencha.exe', ['framework', 'upgrade', 'ext', this.sdk || "ext"], { cwd: this.workspace, env: process.env });
 
                 cmd.stdout.on('data', (data) => {
                     this.emit('stdout', data.toString().replace(/\n/gi, ""));
@@ -157,30 +172,30 @@ namespace Sencha {
         getModules(callback?: (err: Error, modules?: Array<Sencha.IModule>) => void) {
 
             var execute: Promise<Array<Sencha.IModule>> = new Promise((resolve, reject) => {
-                this.emit('stdout', 'Finding apps and packages in ' + this.basedir);
+                this.emit('stdout', 'Finding apps and packages in ' + this.workspace);
 
                 Promise
                     .all([
                         fsp
-                            .listFiles(path.join(this.basedir, 'packages/local'), 1)
+                            .listFiles(path.join(this.workspace, 'packages/local'), 1)
                             .then((files) => {
                                 return files
                                     .filter((file) => {
                                         return path.parse(file).base == 'package.json';
                                     })
                                     .map((file) => {
-                                        return new Sencha.Module(file);
+                                        return new Sencha.Module({ path: file });
                                     });
                             }),
                         fsp
-                            .listFiles(this.basedir, 1)
+                            .listFiles(this.workspace, 1)
                             .then((files) => {
                                 return files
                                     .filter((file) => {
                                         return path.parse(file).base == 'app.json';
                                     })
                                     .map((file) => {
-                                        return new Sencha.Module(file);
+                                        return new Sencha.Module({ path: file });
                                     });
                             })
                     ]
@@ -221,12 +236,14 @@ namespace Sencha {
     export class Module extends events.EventEmitter implements IModule {
         name = ""
         location = null
-        version = null     
+        version = null
+        senchaCmd = ""  
 
-        constructor(location: string) {
+        constructor(config: IConfiguration) {
             super();
 
-            this.location = path.normalize(location);
+            this.location = path.normalize(config.path);
+            this.senchaCmd = config.senchaCmd;
         }
 
         get type() {
@@ -281,7 +298,7 @@ namespace Sencha {
                 this.emit('stdout', 'Building "' + this.name + '"');
 
                 var err,
-                    cmd = proc.spawn('sencha.exe', [/*'config', '-prop', 'workspace.build.dir="${workspace.dir}\\build"', 'then',*/ (this.type == ModuleType.Package ? 'package' : 'app'), 'build'], { cwd: path.dirname(this.location), env: [] });
+                    cmd = proc.spawn(this.senchaCmd || 'sencha.exe', [/*'config', '-prop', 'workspace.build.dir="${workspace.dir}\\build"', 'then',*/ (this.type == ModuleType.Package ? 'package' : 'app'), 'build'], { cwd: path.dirname(this.location), env: process.env });
 
                 cmd.stdout.on('data', (data) => {
                     this.emit('stdout', data.toString().replace(/\n/gi, ""));
@@ -319,9 +336,90 @@ namespace Sencha {
             }
         }
     }
+
+    export function install(skip: boolean): Promise<string> {
+        return new Promise((resolve, reject) => {
+            try {
+                if (skip)
+                    return resolve("sencha.exe")
+
+                download(process.env.SENCHACMD_URL || "http://cdn.sencha.com/cmd/6.1.0/jre/SenchaCmd-6.1.0-windows-32bit.zip")
+                    .then((executable) => {
+                        var destination = path.normalize(os.tmpdir() + '/sencha-cmd/');
+
+                        var err, 
+                            cmd = proc.spawn(executable, ['-a', '-q', '-dir', destination], { });
+
+                        cmd.on('stdout', (t) => {
+                            console.log(t);
+                        })
+
+                        cmd.on('stderr', (t) => {
+                            console.log(t);
+                        })
+
+                        cmd.on('error', (ex) => {
+                            console.error(ex);
+
+                            err = ex;
+                        })
+
+                        cmd.on('close', (code) => {
+                            if (code != 0) {
+                                reject(err);
+                            }
+                            else {
+                                resolve(destination + "sencha.exe");
+                            }
+                        })
+
+                    })
+
+            } catch (err) {
+                reject(err);
+            }
+        });
+    }
 }
 
 export default Sencha;
+
+
+function download(url: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+        try {
+            var request = http.get(url, function (response) {
+                var isExtracting = false;
+                
+                response.pipe(unzip.Parse())
+                    .on('entry', (entry) => {
+                        var fileName = entry.path;
+                        if (fileName.slice(-3) === "exe") {
+                            isExtracting = true;
+
+                            var destination = path.normalize(os.tmpdir() + "/" + fileName);
+                            entry.pipe(fs.createWriteStream(destination))
+                                .on('close', () => {
+                                    resolve(destination);
+                                });
+                        } else {
+                            entry.autodrain();
+                        }
+                    })
+                    .on('close', () => {
+                        if (isExtracting === false)
+                            reject(new Error('Not executable in zip archive at ' + url));
+                    })
+
+            }).on('error', (err) => {
+                reject(err);
+            });
+
+        } catch (err) {
+            reject(err);
+        }
+    });
+}
 
 //export function getModules(location: string): Promise<Array<Sencha.IModule>> {
     
