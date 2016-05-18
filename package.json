@@ -4,7 +4,8 @@
   "description": "Tools for AppVeyor",
   "main": "app.js",
   "bin": {
-    "patch-version": "bin/patch-version.js"
+    "patch-version": "bin/patch-version.js",
+    "build-sencha": "bin/build-sencha.js"
   },
   "author": {
     "name": "24SevenOffice"
