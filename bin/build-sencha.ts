@@ -42,7 +42,8 @@ workspace.upgrade()
         return workspace.build()
             .then(() => {
                 console.log('done building');
-                
+
+                process.exit(0);
             })
             .catch((err) => { 
                 //console.error(err);

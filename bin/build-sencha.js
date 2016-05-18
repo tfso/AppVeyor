@@ -33,6 +33,7 @@ workspace.upgrade()
     return workspace.build()
         .then(function () {
         console.log('done building');
+        process.exit(0);
     })
         .catch(function (err) {
         //console.error(err);

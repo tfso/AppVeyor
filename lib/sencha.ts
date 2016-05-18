@@ -248,7 +248,7 @@ namespace Sencha {
                 fsp
                     .readFile(this.location)
                     .then((content: string) => {
-                        content = content.replace(/("(?:(?:\\[^\n]|[^""\n])*)")|\/\*(.|\n)*?\*\/|(?:\/\/.*$)/mgi, "$1");
+                        content = content.replace(/("(?:(?:\\[^\n]|[^""\n])*)")|\/\*(.|\n|\r\n)*?\*\/|(?:\/\/.*$)/mgi, "$1");
 
                         var json = JSON.parse(content);
 
