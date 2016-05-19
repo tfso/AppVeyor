@@ -24,8 +24,8 @@ if (sdk_dir.length != 0 && path.isAbsolute(sdk_dir) == false) {
 }
 
 process.stdout.write('Building Sencha Project\n');
-console.log('Workspace: ' + base_dir);
-console.log('Sdk: ' + sdk_dir);
+console.log('\u001b[31mWorkspace: ' + base_dir + '\u001b[39m');
+console.log('\u001b[37mSdk: ' + sdk_dir + '\u001b[39m');
 console.log('');
 
 
