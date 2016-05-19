@@ -52,9 +52,9 @@ namespace Sencha {
             super();
 
             this.workspace = path.normalize(config.path);
-            this.sdk = path.normalize(config.sdk);
 
-            this.senchaCmd = config.senchaCmd;
+            this.sdk = config.sdk ? path.normalize(config.sdk) : "";
+            this.senchaCmd = config.senchaCmd ? config.senchaCmd : "";
         }
 
         //output(std: Buffer) {
@@ -369,20 +369,7 @@ namespace Sencha {
                                 reject(err);
                             }
                             else {
-                                fsp.listFiles(destination)
-                                    .then((files) => {
-                                        files.forEach((file) => {
-                                            console.log(file);
-                                        });
-
-                                        resolve(destination + "sencha.exe");
-                                    })
-                                    .catch((err) => {
-                                        console.error(err);
-                                    })
-
-
-                                
+                                resolve(destination + "sencha.exe");    
                             }
                         })
 
@@ -396,7 +383,6 @@ namespace Sencha {
 }
 
 export default Sencha;
-
 
 function download(url: string): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -433,48 +419,4 @@ function download(url: string): Promise<string> {
         }
     });
 }
-
-//export function getModules(location: string): Promise<Array<Sencha.IModule>> {
-    
-//    location = path.resolve(location);
-//    return new Promise((resolve, reject) => {
-
-//        console.log(location);
-
-//        Promise
-//            .all([
-//                fsp
-//                    .listFiles(path.join(location, 'packages/local'), 1)
-//                    .then((files) => {
-//                        return files
-//                            .filter((file) => {
-//                                return path.parse(file).base == 'package.json';
-//                            })
-//                            .map((file) => {
-//                                return new Sencha.Module(file);
-//                            });
-//                    }),
-//                fsp
-//                    .listFiles(location, 1)
-//                    .then((files) => {
-//                        return files
-//                            .filter((file) => {
-//                                return path.parse(file).base == 'app.json';
-//                            })
-//                            .map((file) => {
-//                                return new Sencha.Module(file);
-//                            });
-//                    })                
-//            ]
-//            )
-//            .then((response) => {
-//                resolve([].concat.apply([], response));
-//            })
-//            .catch((err) => {
-//                reject(err);
-//            })
-
-//        return;
-//    })
-//}
 
