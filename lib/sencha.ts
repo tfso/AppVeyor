@@ -66,16 +66,16 @@ namespace Sencha {
             while ((match = regex.exec(std.toString())) != null) {
                 switch (match[1]) {
                     case "INF":
-                        this.emit('stdout', colors.green('[INF]') + ' ' + match[2] + '\n'); break;
+                        this.emit('stdout', '\u001b[32[INF]\u001b[39 ' + match[2] + '\n'); break;
 
                     case "LOG":
-                        this.emit('stdout', '[INF]' + ' ' + match[2] + '\n'); break;
+                        this.emit('stdout', '[LOG]' + ' ' + match[2] + '\n'); break;
 
                     case "WARN":
-                        this.emit('stdout', colors.yellow('[INF]') + ' ' + match[2] + '\n'); break;
+                        this.emit('stdout', '\u001b[33[WARN]\u001b[39 ' + match[2] + '\n'); break;
 
                     case "ERR":
-                        this.emit('stderr', colors.red('[ERR]') + ' ' + match[2] + '\n'); break;
+                        this.emit('stderr', '\u001b[31[ERR]\u001b[39 ' + match[2] + '\n'); break;
 
                     default:
                         this.emit('stdout', match[2] + '\n'); break;
