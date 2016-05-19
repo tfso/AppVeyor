@@ -20,9 +20,8 @@ if (sdk_dir.length != 0 && path.isAbsolute(sdk_dir) == false) {
     sdk_dir = path.resolve(base_dir, sdk_dir);
 }
 process.stdout.write('Building Sencha Project\n');
-console.log('\u001b[31mWorkspace: ' + base_dir + '\u001b[39m');
-console.log('\u001b[37mSdk: ' + sdk_dir + '\u001b[39m');
-console.log('');
+console.log('Workspace: ' + base_dir);
+console.log('Sdk: ' + sdk_dir);
 sencha_1.default.install(skip_install)
     .then(function (cmd) {
     console.log('Sencha Command: ' + cmd);
