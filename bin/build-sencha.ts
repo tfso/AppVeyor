@@ -56,24 +56,27 @@ sencha.install(skip_install)
 
         workspace.upgrade()
             .then(() => {
-                return workspace.build()
+                workspace.build()
                     .then(() => {
                         process.stdout.write('\u001b[36mDone building\u001b[39m');
                         process.exit(0);
                     })
                     .catch((err) => {
-                        process.stderr.write(err);
+                        process.stdout.write("Failed; Workspace Build\n");
+                        if (err) process.stderr.write(err);
                         process.exit(-1);
                     })
             })
             .catch((err) => {
-                process.stderr.write(err);
+                process.stdout.write("Failed; Workspace Upgrade\n");
+                if (err) process.stderr.write(err);
                 process.exit(-1);
             })
 
     })
     .catch((err) => {
-        process.stderr.write(err);
+        process.stdout.write("Failed; Sencha Install\n");
+        if (err) process.stderr.write(err);
         process.exit(-1);
     })
 
