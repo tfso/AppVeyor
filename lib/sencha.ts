@@ -130,7 +130,7 @@ namespace Sencha {
                     .then((modules) => {
 
                         modules.forEach((module) => {
-                            this.emit('stdout', 'Found ' + (module.type == ModuleType.Package ? 'package' : 'application') + ' "' + module.name + '" at "' + path.dirname(module.location) + '"');
+                            this.emit('stdout', 'Found ' + (module.type == ModuleType.Package ? 'package' : 'application') + ' "' + module.name + '" at "' + path.dirname(module.location) + '"\n');
 
                             module.on('stdout', (data) => {
                                 this.output(data);
@@ -176,7 +176,7 @@ namespace Sencha {
         getModules(callback?: (err: Error, modules?: Array<Sencha.IModule>) => void) {
 
             var execute: Promise<Array<Sencha.IModule>> = new Promise((resolve, reject) => {
-                this.emit('stdout', 'Finding apps and packages in ' + this.workspace);
+                this.emit('stdout', 'Finding apps and packages in ' + this.workspace + '\n');
 
                 Promise
                     .all([
@@ -299,7 +299,7 @@ namespace Sencha {
             var execute = new Promise((resolve, reject) => {
 
 
-                this.emit('stdout', 'Building "' + this.name + '"');
+                this.emit('stdout', 'Building "' + this.name + '"\n');
 
                 var err,
                     cmd = proc.spawn(this.senchaCmd || 'sencha.exe', [/*'config', '-prop', 'workspace.build.dir="${workspace.dir}\\build"', 'then',*/ (this.type == ModuleType.Package ? 'package' : 'app'), 'build'], { cwd: path.dirname(this.location), env: process.env });
