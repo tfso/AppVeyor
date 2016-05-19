@@ -369,6 +369,14 @@ namespace Sencha {
                                 reject(err);
                             }
                             else {
+                                fsp.listFiles(destination)
+                                    .then((files) => {
+                                        files.forEach((file) => {
+                                            console.log(file);
+                                        });
+                                    })
+
+
                                 resolve(destination + "sencha.exe");
                             }
                         })
