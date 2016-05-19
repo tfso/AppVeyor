@@ -40,16 +40,20 @@ sencha.install(skip_install)
         });
 
         workspace.on('stdout', (data) => {
-            process.stdout.write(data + '\n');
+            process.stdout.write(data);
         });
 
         workspace.on('stderr', (data) => {
-            process.stderr.write(data + '\n');
+            process.stderr.write(data);
         });
 
         workspace.on('close', (code, err) => {
             if (code != 0) {
-                process.stderr.write(err + '\n');
+                process.stderr.write('Exit Code: ' + code);
+
+                if (err)
+                    process.stderr.write(err + '\n');
+
                 process.exit(code);
             }
         });

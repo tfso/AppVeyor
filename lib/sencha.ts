@@ -8,6 +8,7 @@ import async = require('async');
 
 import http = require('http');
 import unzip = require('unzip');
+import colors = require('colors/safe');
 
 namespace Sencha {
 
@@ -57,26 +58,30 @@ namespace Sencha {
             this.senchaCmd = config.senchaCmd ? config.senchaCmd : "";
         }
 
-        //output(std: Buffer) {
+        output(std: Buffer) {
 
-        //    var regex = /^(?:\[([A-Z]{3})\])?(.*)$/gmi,
-        //        match;
+            var regex = /^(?:\[([A-Z]{3})\])?(.+)$/mgi,
+                match;
 
-        //    while ( (match = regex.exec( std.toString() )) != null) {
-        //        switch (match[1]) {
-        //            case "INF":
-        //            case "LOG":
-        //            case "WARN":
-        //                this.emit('stdout', match[2]); break;
+            while ((match = regex.exec(std.toString())) != null) {
+                switch (match[1]) {
+                    case "INF":
+                        this.emit('stdout', colors.green('[INF]') + ' ' + match[2] + '\n'); break;
 
-        //            case "ERR":
-        //                this.emit('stderr', match[2]); break;
+                    case "LOG":
+                        this.emit('stdout', '[INF]' + ' ' + match[2] + '\n'); break;
 
-        //            default:
-        //                this.emit('stdout', match[2]); break;
-        //        }
-        //    }
-        //}
+                    case "WARN":
+                        this.emit('stdout', colors.yellow('[INF]') + ' ' + match[2] + '\n'); break;
+
+                    case "ERR":
+                        this.emit('stderr', colors.red('[ERR]') + ' ' + match[2] + '\n'); break;
+
+                    default:
+                        this.emit('stdout', match[2] + '\n'); break;
+                }
+            }
+        }
 
         upgrade(callback?: (err: Error) => void) {
             var execute = new Promise((resolve, reject) => {
@@ -84,11 +89,11 @@ namespace Sencha {
                     cmd = proc.spawn(this.senchaCmd || 'sencha.exe', ['framework', 'upgrade', 'ext', this.sdk || "ext"], { cwd: this.workspace, env: process.env });
 
                 cmd.stdout.on('data', (data) => {
-                    this.emit('stdout', data.toString().replace(/\n/gi, ""));
+                    this.output(data); // this.emit('stdout', data.toString().replace(/\n/gi, ""));
                 })
 
                 cmd.stderr.on('data', (data) => {
-                    this.emit('stderr', data.toString().replace(/\n/gi, ""));
+                    this.output(data); //this.emit('stderr', data.toString().replace(/\n/gi, ""));
                 })
 
                 cmd.on('error', (ex) => {
