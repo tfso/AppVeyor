@@ -8,7 +8,6 @@ import async = require('async');
 
 import http = require('http');
 import unzip = require('unzip');
-import colors = require('colors/safe');
 
 namespace Sencha {
 
@@ -78,7 +77,7 @@ namespace Sencha {
                         this.emit('stderr', '\u001b[31m[ERR]\u001b[39m ' + match[2] + '\n'); break;
 
                     default:
-                        this.emit('stdout', match[2] + '\n'); break;
+                        this.emit('stdout', match[2] + (match[2].length == 1 ? '' + '\n')); break;
                 }
             }
         }
@@ -134,11 +133,11 @@ namespace Sencha {
                             this.emit('stdout', 'Found ' + (module.type == ModuleType.Package ? 'package' : 'application') + ' "' + module.name + '" at "' + path.dirname(module.location) + '"');
 
                             module.on('stdout', (data) => {
-                                this.emit('stdout', data);
+                                this.output(data);
                             })
 
                             module.on('stderr', (data) => {
-                                this.emit('stderr', data);
+                                this.output(data);
                             })
                         });
 
