@@ -77,7 +77,7 @@ namespace Sencha {
                         this.emit('stderr', '\u001b[31m[ERR]\u001b[39m ' + match[2] + '\n'); break;
 
                     default:
-                        this.emit('stdout', match[2] + (match[2].length == 1 ? '' + '\n')); break;
+                        this.emit('stdout', match[2] + (match[2].length == 1 ? '' : '\n')); break;
                 }
             }
         }

@@ -67,13 +67,17 @@ sencha.install(skip_install)
                         process.exit(0);
                     })
                     .catch((err) => {
-                        //console.error(err);
+                        console.error(err);
                     })
 
                 //console.log(stdout);
             })
-    //})
-    //.catch((err) => {
-    //    console.error(err);
-    //})
+            .catch((err) => {
+                console.error(err);
+            })
+
+    })
+    .catch((err) => {
+        console.error(err);
+    })
 

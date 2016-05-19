@@ -53,17 +53,15 @@ sencha_1.default.install(skip_install)
             process.exit(0);
         })
             .catch(function (err) {
-            //console.error(err);
+            console.error(err);
         });
         //console.log(stdout);
+    })
+        .catch(function (err) {
+        console.error(err);
     });
-    //})
-    //.catch((err) => {
-    //    console.error(err);
-    //})
+})
+    .catch(function (err) {
+    console.error(err);
 });
-//})
-//.catch((err) => {
-//    console.error(err);
-//})
 //# sourceMappingURL=build-sencha.js.map
