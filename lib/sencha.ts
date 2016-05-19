@@ -96,6 +96,8 @@ namespace Sencha {
 
         upgrade(callback?: (err: Error) => void) {
             var execute = new Promise((resolve, reject) => {
+                return resolve();
+
                 var err,
                     cmd = proc.spawn(this.senchaCmd || 'sencha.exe', ['framework', 'upgrade', 'ext', this.sdk || "ext"], { cwd: this.workspace, env: process.env });
 
@@ -142,7 +144,7 @@ namespace Sencha {
                     .then((modules) => {
 
                         modules.forEach((module) => {
-                            this.emit('stdout', 'Found ' + (module.type == ModuleType.Package ? 'package' : 'application') + ' "' + module.name + '" at "' + path.dirname(module.location) + '"\n');
+                            this.emit('stdout', 'Found ' + (module.type == ModuleType.Package ? 'package' : 'application') + ' "\u001b[01m\u001b[36m' + module.name + '\u001b[0m" at "' + path.dirname(module.location) + '"\n');
 
                             module.on('stdout', (data) => {
                                 this.output(data);
@@ -311,7 +313,7 @@ namespace Sencha {
             var execute = new Promise((resolve, reject) => {
 
 
-                this.emit('stdout', 'Building "' + this.name + '"\n');
+                this.emit('stdout', 'Building "\u001b[01m\u001b[36m' + this.name + '\u001b[0m"\n');
 
                 var err,
                     cmd = proc.spawn(this.senchaCmd || 'sencha.exe', [/*'config', '-prop', 'workspace.build.dir="${workspace.dir}\\build"', 'then',*/ (this.type == ModuleType.Package ? 'package' : 'app'), 'build'], { cwd: path.dirname(this.location), env: process.env });
