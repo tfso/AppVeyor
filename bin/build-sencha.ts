@@ -40,7 +40,7 @@ sencha.install(skip_install)
         });
 
         workspace.on('stdout', (data) => {
-            process.stdout.write(data);
+            console.log(data);
         });
 
         workspace.on('stderr', (data) => {

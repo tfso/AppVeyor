@@ -32,7 +32,7 @@ sencha_1.default.install(skip_install)
         senchaCmd: cmd
     });
     workspace.on('stdout', function (data) {
-        process.stdout.write(data);
+        console.log(data);
     });
     workspace.on('stderr', function (data) {
         process.stderr.write(data);
