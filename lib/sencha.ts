@@ -184,7 +184,7 @@ namespace Sencha {
                                         return path.parse(file).base == 'package.json';
                                     })
                                     .map((file) => {
-                                        return new Sencha.Module({ path: file });
+                                        return new Sencha.Module({ path: file, senchaCmd: this.senchaCmd });
                                     });
                             }),
                         fsp
@@ -195,7 +195,7 @@ namespace Sencha {
                                         return path.parse(file).base == 'app.json';
                                     })
                                     .map((file) => {
-                                        return new Sencha.Module({ path: file });
+                                        return new Sencha.Module({ path: file, senchaCmd: this.senchaCmd });
                                     });
                             })
                     ]
