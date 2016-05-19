@@ -9,7 +9,7 @@ if (process.argv.length >= 2 && (process.argv[2] == "true" || process.argv[2] ==
     var sdk_dir = process.argv[4] || "";
 }
 else {
-    var skip_install = true;
+    var skip_install = false;
     var base_dir = process.argv[2] || process.cwd();
     var sdk_dir = process.argv[3] || "";
 }
@@ -37,7 +37,7 @@ sencha.install(skip_install)
         var workspace = new sencha.Workspace({
             path: base_dir,
             sdk: sdk_dir,
-            senchaCmd: ""
+            senchaCmd: cmd
         });
 
         workspace.on('stdout', (data) => {
