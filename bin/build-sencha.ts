@@ -24,12 +24,12 @@ if (sdk_dir.length != 0 && path.isAbsolute(sdk_dir) == false) {
 }
 
 process.stdout.write('Building Sencha Project\n');
-console.log('Workspace: ' + base_dir);
-console.log('Sdk: ' + sdk_dir);
+process.stdout.write('Workspace: ' + base_dir + '\n');
+process.stdout.write('Sdk: ' + sdk_dir + '\n');
 
 sencha.install(skip_install)
     .then((cmd) => {
-        console.log('Sencha Command: ' + cmd);
+        process.stdout.write('Sencha Command: ' + cmd + '\n');
 
         var workspace = new sencha.Workspace({
             path: base_dir,
@@ -47,35 +47,33 @@ sencha.install(skip_install)
 
         workspace.on('close', (code, err) => {
             if (code != 0) {
-                process.stderr.write('Exit Code: ' + code);
-
-                if (err)
-                    process.stderr.write(err + '\n');
-
-                process.exit(code);
+                //if (err)
+                //    process.stderr.write('\\u001b[41m\u001b[36m' + err + '\u001b[0m\n');
             }
         });
+
+        process.stdout.write('\n');
 
         workspace.upgrade()
             .then(() => {
                 return workspace.build()
                     .then(() => {
-                        console.log('done building');
-
+                        process.stdout.write('\u001b[36mDone building\u001b[39m');
                         process.exit(0);
                     })
                     .catch((err) => {
-                        console.error(err);
+                        process.stderr.write(err);
+                        process.exit(-1);
                     })
-
-                //console.log(stdout);
             })
             .catch((err) => {
-                console.error(err);
+                process.stderr.write(err);
+                process.exit(-1);
             })
 
     })
     .catch((err) => {
-        console.error(err);
+        process.stderr.write(err);
+        process.exit(-1);
     })
 

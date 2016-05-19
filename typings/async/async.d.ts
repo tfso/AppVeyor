@@ -106,9 +106,9 @@ interface Async {
     some<T>(arr: T[], iterator: AsyncBooleanIterator<T>, callback?: (result: boolean) => void): any;
     someLimit<T>(arr: T[], limit: number, iterator: AsyncBooleanIterator<T>, callback?: (result: boolean) => void): any;
     any<T>(arr: T[], iterator: AsyncBooleanIterator<T>, callback?: (result: boolean) => void): any;
-    every<T>(arr: T[], iterator: AsyncBooleanIterator<T>, callback?: (result: boolean) => any): any;
-    everyLimit<T>(arr: T[], limit: number, iterator: AsyncBooleanIterator<T>, callback?: (result: boolean) => any): any;
-    all<T>(arr: T[], iterator: AsyncBooleanIterator<T>, callback?: (result: boolean) => any): any;
+    every<T>(arr: T[], iterator: AsyncBooleanIterator<T>, callback?: (err: any, result: boolean) => any): any;
+    everyLimit<T>(arr: T[], limit: number, iterator: AsyncBooleanIterator<T>, callback?: (err: any, result: boolean) => any): any;
+    all<T>(arr: T[], iterator: AsyncBooleanIterator<T>, callback?: (err: any, result: boolean) => any): any;
     concat<T, R>(arr: T[], iterator: AsyncResultIterator<T, R[]>, callback?: AsyncResultArrayCallback<R>): any;
     concatSeries<T, R>(arr: T[], iterator: AsyncResultIterator<T, R[]>, callback?: AsyncResultArrayCallback<R>): any;
 

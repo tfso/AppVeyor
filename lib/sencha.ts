@@ -153,22 +153,27 @@ namespace Sencha {
                             })
                         });
 
-                        async.series(
-                            modules.map((module) => {
-                                return (cb) => {
-                                    this.emit('stdout', '\n');
-                                    module.build(cb);
-                                };
-                            }),
-                            (err, res) => {
+                        var err = null;
+                        async.everyLimit<IModule>(
+                            modules, 1,
+                            (module, cb) => {
+                                this.emit('stdout', '\n');
+                                module.build((ex) => {
+                                    if (ex) {
+                                        err = ex; cb("", true);
+                                    } else {
+                                        cb("", true);
+                                    }
+                                })
+                            },
+                            (message, result) => {
                                 if (err) {
                                     this.emit('close', -1, err); reject(err);
                                 }
                                 else {
                                     this.emit('close', 0); resolve();
                                 }
-                            }
-                        )
+                            });
                     })
                     .catch((err) => {
                         this.emit('close', -1, err); reject(err);
@@ -307,6 +312,31 @@ namespace Sencha {
             }
         }
 
+        output(std: Buffer) {
+            var regex = /^(?:\[([A-Z]{3})\])?\s*(.+)$/mgi,
+                match;
+
+            while ((match = regex.exec(std.toString())) != null) {
+
+                switch (match[1]) {
+                    case "INF":
+                        this.emit('stdout', '\u001b[32m[INF]\u001b[39m ' + match[2] + '\n'); break;
+
+                    case "LOG":
+                        this.emit('stdout', '[LOG]' + ' ' + match[2] + '\n'); break;
+
+                    case "WARN":
+                        this.emit('stdout', '\u001b[33m[WARN]\u001b[39m ' + match[2] + '\n'); break;
+
+                    case "ERR":
+                        this.emit('stderr', '\u001b[31m[ERR]\u001b[39m ' + match[2] + '\n'); break;
+
+                    default:
+                        this.emit('stdout', match[2] + '\n'); break;
+                }
+            }
+        }
+
         build(callback?: (err: Error) => void) {
             var execute = new Promise((resolve, reject) => {
 
@@ -317,11 +347,11 @@ namespace Sencha {
                     cmd = proc.spawn(this.senchaCmd || 'sencha.exe', [/*'config', '-prop', 'workspace.build.dir="${workspace.dir}\\build"', 'then',*/ (this.type == ModuleType.Package ? 'package' : 'app'), 'build'], { cwd: path.dirname(this.location), env: process.env });
 
                 cmd.stdout.on('data', (data) => {
-                    this.emit('stdout', data.toString().replace(/\n/gi, ""));
+                    this.output(data);
                 })
 
                 cmd.stderr.on('data', (data) => {
-                    this.emit('stderr', data.toString().replace(/\n/gi, ""));
+                    this.output(data);
                 })
 
                 cmd.on('error', (ex) => {
@@ -330,7 +360,7 @@ namespace Sencha {
 
                 cmd.on('close', (code) => {
                     if (code != 0) {
-                        this.emit('close', code, err); reject(err);
+                        this.emit('close', code, err); reject(new Error("Build failed (" + code + ")"));
                     }
                     else {
                         this.emit('close', 0, null);
