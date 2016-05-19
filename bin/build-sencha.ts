@@ -62,9 +62,10 @@ sencha.install(skip_install)
                         process.exit(0);
                     })
                     .catch((err) => {
+                        process.exit(-1);
                         process.stdout.write("Failed; Workspace Build\n");
                         if (err) process.stderr.write(err);
-                        process.exit(-1);
+                        
                     })
             })
             .catch((err) => {
