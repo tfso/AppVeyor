@@ -374,10 +374,15 @@ namespace Sencha {
                                         files.forEach((file) => {
                                             console.log(file);
                                         });
+
+                                        resolve(destination + "sencha.exe");
+                                    })
+                                    .catch((err) => {
+                                        console.error(err);
                                     })
 
 
-                                resolve(destination + "sencha.exe");
+                                
                             }
                         })
 
