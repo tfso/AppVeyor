@@ -48,6 +48,8 @@ namespace Sencha {
         sdk = ""
         senchaCmd = ""
 
+        _lastOutputWithLF = false
+
         constructor(config: IConfiguration) {
             super();
 
@@ -63,6 +65,12 @@ namespace Sencha {
                 match;
 
             while ((match = regex.exec(std.toString())) != null) {
+
+                if (this._lastOutputWithLF == false && (match[2].length > 1)) {
+                    this._lastOutputWithLF = true;
+                    this.emit('stdout', '\n');
+                }
+
                 switch (match[1]) {
                     case "INF":
                         this.emit('stdout', '\u001b[32m[INF]\u001b[39m ' + match[2] + '\n'); break;
@@ -77,7 +85,11 @@ namespace Sencha {
                         this.emit('stderr', '\u001b[31m[ERR]\u001b[39m ' + match[2] + '\n'); break;
 
                     default:
-                        this.emit('stdout', match[2] + (match[2].length == 1 ? '' : '\n')); break;
+                        if (match[2].length == 1) {
+                            this.emit('stdout', match[2]); this._lastOutputWithLF = false; break;
+                        } else {
+                            this.emit('stdout', match[2] + '\n'); break;
+                        }                       
                 }
             }
         }
