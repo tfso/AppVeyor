@@ -80,16 +80,16 @@ program
                     })
                     .catch((err) => {
                         process.stdout.write("Failed; Workspace Build\n");
-                        if (err)
-                            process.stdout.write(err || "");
+                        //if (err)
+                        //    process.stdout.write(err || "");
 
                         process.exit(1);  
                     })
             })
             .catch((err) => {
                 process.stdout.write("Failed; Workspace Upgrade\n");
-                if (err)
-                    process.stdout.write(err || "");
+                //if (err)
+                //    process.stdout.write(err || "");
 
                 process.exit(1);
             })

@@ -1,6 +1,6 @@
 ﻿# Test against this version of Node.js
 environment:
-  nodejs_version: "0"
+  nodejs_version: "4"
 
 branches:
     only:
