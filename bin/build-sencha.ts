@@ -19,7 +19,7 @@ program
             .then((cmd) => {
                 process.stdout.write('Sencha command installed at "' + cmd + '"\n');
 
-                options.senchaCmd = process.env.SENCHACMD = cmd;
+                process.env.SENCHACMD = cmd;
                 process.exit(0);
             })
             .catch((err) => {
@@ -31,7 +31,11 @@ program
     .command('repository <name> <url>')
     .description('Add a remote repository that should be used') //, (a, b) => { b.push(a); return b; }, [])
     .action((name, url, options) => {
-        sencha.cmd = options.senchaCmd
+        sencha.cmd = options.parent.senchaCmd
+
+        process.stdout.write('Adding repository for Sencha\n');
+        process.stdout.write('Cmd: ' + options.parent.senchaCmd + '\n');
+        process.stdout.write('\n');
 
         sencha.addRepository(name, url)
             .then((output) => {
@@ -48,7 +52,7 @@ program
     .description('Build all packages and apps in a workspace')
     .option('-p, --path <workspace>', 'Path to workspace', path.normalize, process.cwd())
     .action((options) => {
-        sencha.cmd = options.senchaCmd
+        sencha.cmd = options.parent.senchaCmd
 
         var workspace = new sencha.Workspace({
             path: options.path
@@ -63,7 +67,8 @@ program
         });
 
         process.stdout.write('Building Sencha Project\n');
-        process.stdout.write('Workspace: ' + options.path + '\n');
+        process.stdout.write('Workspace: ' + workspace.workspace + '\n');
+        process.stdout.write('Cmd: ' + sencha.cmd  + '\n');
         process.stdout.write('\n');
 
         workspace.upgrade()
