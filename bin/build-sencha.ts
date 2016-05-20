@@ -35,6 +35,7 @@ program
 
         process.stdout.write('Adding repository for Sencha\n');
         process.stdout.write('Cmd: ' + options.parent.senchaCmd + '\n');
+        process.stdout.write('Cmd Env: ' + process.env.SENCHACMD + '\n');
         process.stdout.write('\n');
 
         sencha.addRepository(name, url)

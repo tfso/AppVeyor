@@ -30,6 +30,7 @@ program
     sencha_1.default.cmd = options.parent.senchaCmd;
     process.stdout.write('Adding repository for Sencha\n');
     process.stdout.write('Cmd: ' + options.parent.senchaCmd + '\n');
+    process.stdout.write('Cmd Env: ' + process.env.SENCHACMD + '\n');
     process.stdout.write('\n');
     sencha_1.default.addRepository(name, url)
         .then(function (output) {
