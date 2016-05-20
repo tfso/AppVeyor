@@ -3,6 +3,7 @@
 import sencha from './../lib/sencha';
 import path = require('path');
 import program = require('commander');
+import proc = require('child_process');
 
 program
     .version(process.env.npm_package_version || require('./../package.json').version)
@@ -25,6 +26,11 @@ program
 
                 process.env.SENCHACMD = cmd
 
+                process.stdout.write('DEBUG:' + process.env.SENCHACMD);
+
+                proc.exec("SET SENCHACMD=" + cmd, {}, () => { });
+                
+                process.stdout.write('DEBUG:' + process.env.SENCHACMD);
 
                 process.exit(0);
             })

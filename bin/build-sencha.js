@@ -3,6 +3,7 @@
 var sencha_1 = require('./../lib/sencha');
 var path = require('path');
 var program = require('commander');
+var proc = require('child_process');
 program
     .version(process.env.npm_package_version || require('./../package.json').version)
     .option('-c, --sencha-cmd <path>', 'Path to sencha command, either given by install or environment SENCHACMD', path.normalize, process.env.SENCHACMD || "sencha.exe");
@@ -17,6 +18,9 @@ program
         process.stdout.write('Sencha command installed at "' + cmd + '"\n');
         options.parent.senchaCmd = process.env.SENCHACMD = cmd;
         process.env.SENCHACMD = cmd;
+        process.stdout.write('DEBUG:' + process.env.SENCHACMD);
+        proc.exec("SET SENCHACMD=" + cmd, {}, function () { });
+        process.stdout.write('DEBUG:' + process.env.SENCHACMD);
         process.exit(0);
     })
         .catch(function (err) {
