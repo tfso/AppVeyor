@@ -68,7 +68,8 @@ program
 
         process.stdout.write('Building Sencha Project\n');
         process.stdout.write('Workspace: ' + workspace.workspace + '\n');
-        process.stdout.write('Cmd: ' + sencha.cmd  + '\n');
+        process.stdout.write('Cmd: ' + sencha.cmd + '\n');
+        process.stdout.write('Cmd Env: ' + process.env.SENCHACMD + '\n');
         process.stdout.write('\n');
 
         workspace.upgrade()
