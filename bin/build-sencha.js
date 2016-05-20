@@ -2,33 +2,50 @@
 "use strict";
 var sencha_1 = require('./../lib/sencha');
 var path = require('path');
-if (process.argv.length >= 2 && (process.argv[2] == "true" || process.argv[2] == "false")) {
-    var skip_install = process.argv[2] === "true";
-    var base_dir = process.argv[3] || process.cwd();
-    var sdk_dir = process.argv[4] || "";
-}
-else {
-    var skip_install = false;
-    var base_dir = process.argv[2] || process.cwd();
-    var sdk_dir = process.argv[3] || "";
-}
-//if (sdk_dir.length == 0) {
-//    console.error("Sencha SDK is missing;" + sdk_dir);
-//    process.exit(-1);
-//}
-if (sdk_dir.length != 0 && path.isAbsolute(sdk_dir) == false) {
-    sdk_dir = path.resolve(base_dir, sdk_dir);
-}
-process.stdout.write('Building Sencha Project\n');
-process.stdout.write('Workspace: ' + base_dir + '\n');
-process.stdout.write('Sdk: ' + sdk_dir + '\n');
-sencha_1.default.install(skip_install)
-    .then(function (cmd) {
-    process.stdout.write('Sencha Command: ' + cmd + '\n');
+var program = require('commander');
+program
+    .version(process.env.npm_package_version || require('./../package.json').version)
+    .option('-c, --sencha-cmd <path>', 'Path to sencha command, either given by install or environment SENCHACMD', path.normalize, process.env.SENCHACMD || "sencha.exe");
+program
+    .command('install')
+    .option('-u, --url <url>', 'Url to sencha command sdk', process.env.SENCHACMD_URL || 'http://cdn.sencha.com/cmd/6.1.2/jre/SenchaCmd-6.1.2-windows-32bit.zip')
+    .action(function (options) {
+    process.stdout.write('Installing Sencha Cmd\n');
+    process.stdout.write('Url: ' + options.url + '\n');
+    sencha_1.default.install(options.url)
+        .then(function (cmd) {
+        process.stdout.write('Sencha command installed at "' + cmd + '"');
+        process.env.SENCHACMD = cmd;
+        process.exit(0);
+    })
+        .catch(function (err) {
+        process.stderr.write(err);
+        process.exit(1);
+    });
+});
+program
+    .command('repository <name> <url>')
+    .description('Add a remote repository that should be used') //, (a, b) => { b.push(a); return b; }, [])
+    .action(function (name, url, options) {
+    sencha_1.default.cmd = options.senchaCmd;
+    sencha_1.default.addRepository(name, url)
+        .then(function (output) {
+        process.stdout.write(output);
+        process.exit(0);
+    })
+        .catch(function (err) {
+        process.stderr.write(err);
+        process.exit(1);
+    });
+});
+program
+    .command('build')
+    .description('Build all packages and apps in a workspace')
+    .option('-p, --path <workspace>', 'Path to workspace', path.normalize, process.cwd())
+    .action(function (options) {
+    sencha_1.default.cmd = options.senchaCmd;
     var workspace = new sencha_1.default.Workspace({
-        path: base_dir,
-        sdk: sdk_dir,
-        senchaCmd: cmd
+        path: options.path
     });
     workspace.on('stdout', function (data) {
         process.stdout.write(data);
@@ -36,10 +53,8 @@ sencha_1.default.install(skip_install)
     workspace.on('stderr', function (data) {
         process.stderr.write(data);
     });
-    workspace.on('close', function (code, err) {
-        if (code != 0) {
-        }
-    });
+    process.stdout.write('Building Sencha Project\n');
+    process.stdout.write('Workspace: ' + options.path + '\n');
     process.stdout.write('\n');
     workspace.upgrade()
         .then(function () {
@@ -61,11 +76,13 @@ sencha_1.default.install(skip_install)
             process.stderr.write(err);
         process.exit(1);
     });
-})
-    .catch(function (err) {
-    process.stdout.write("Failed; Sencha Install\n");
-    if (err)
-        process.stderr.write(err);
-    process.exit(1);
 });
+program
+    .command('*')
+    .action(function () {
+    program.help();
+});
+program.parse(process.argv);
+if (program.args.length == 0)
+    program.help();
 //# sourceMappingURL=build-sencha.js.map

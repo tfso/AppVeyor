@@ -10,6 +10,8 @@ import http = require('http');
 import unzip = require('unzip');
 
 namespace Sencha {
+    
+    export var cmd: string
 
     export enum ModuleType {
         Package,
@@ -19,8 +21,6 @@ namespace Sencha {
     export interface IConfiguration {
         path: string;
         sdk?: string;
-
-        senchaCmd?: string
     }
 
     export interface IWorkspace extends NodeJS.EventEmitter {
@@ -54,50 +54,29 @@ namespace Sencha {
             super();
 
             this.workspace = path.normalize(config.path);
-
             this.sdk = config.sdk ? path.normalize(config.sdk) : "";
-            this.senchaCmd = config.senchaCmd ? config.senchaCmd : "";
         }
 
         output(std: Buffer) {
+            getSenchaOutput(std)
+                .forEach((line) => {
+                    if (this._lastOutputWithLF == false && line.length > 1) {
+                        this._lastOutputWithLF = true;
+                        this.emit('stdout', '\n');
+                    }
 
-            var regex = /^(?:\[([A-Z]{3})\])?\s*(.+)$/mgi,
-                match;
-
-            while ((match = regex.exec(std.toString())) != null) {
-
-                if (this._lastOutputWithLF == false && (match[2].length > 1)) {
-                    this._lastOutputWithLF = true;
-                    this.emit('stdout', '\n');
-                }
-
-                switch (match[1]) {
-                    case "INF":
-                        this.emit('stdout', '\u001b[32m[INF]\u001b[39m ' + match[2] + '\n'); break;
-
-                    case "LOG":
-                        this.emit('stdout', '[LOG]' + ' ' + match[2] + '\n'); break;
-
-                    case "WARN":
-                        this.emit('stdout', '\u001b[33m[WARN]\u001b[39m ' + match[2] + '\n'); break;
-
-                    case "ERR":
-                        this.emit('stderr', '\u001b[31m[ERR]\u001b[39m ' + match[2] + '\n'); break;
-
-                    default:
-                        if (match[2].length == 1) {
-                            this.emit('stdout', match[2]); this._lastOutputWithLF = false; break;
-                        } else {
-                            this.emit('stdout', match[2] + '\n'); break;
-                        }                       
-                }
-            }
+                    if (line.length == 1) {
+                        this.emit('stdout', line); this._lastOutputWithLF = false;
+                    } else {
+                        this.emit('stdout', line + '\n');
+                    }  
+                })
         }
 
         upgrade(callback?: (err: Error) => void) {
             var execute = new Promise((resolve, reject) => {
                 var err,
-                    cmd = proc.spawn(this.senchaCmd || 'sencha.exe', ['framework', 'upgrade', 'ext', this.sdk || "ext"], { cwd: this.workspace, env: process.env });
+                    cmd = proc.spawn(Sencha.cmd || 'sencha.exe', ['framework', 'upgrade', 'ext', this.sdk || "ext"], { cwd: this.workspace, env: process.env });
 
                 cmd.stdout.on('data', (data) => {
                     this.output(data); // this.emit('stdout', data.toString().replace(/\n/gi, ""));
@@ -114,43 +93,6 @@ namespace Sencha {
                 cmd.on('close', (code) => {
                     if (code != 0) {
                         this.emit('close', code, err); reject(err || new Error('Upgrading workspace failed (' + code + ')'));
-                    }
-                    else {
-                        this.emit('close', 0, null); resolve();
-                    }
-                })
-            });
-
-            if (callback != null) {
-                // callback
-                execute.then(() => { callback(null); }).catch((err) => { callback(err); });
-            }
-            else {
-                // promise
-                return execute;
-            }
-        }
-
-        addRepository(name: string, url: string, callback?: (err: Error) => void) {
-            var execute = new Promise((resolve, reject) => {
-                var err,
-                    cmd = proc.spawn(this.senchaCmd || 'sencha.exe', ['repository', 'add', name, url], { cwd: this.workspace, env: process.env });
-
-                cmd.stdout.on('data', (data) => {
-                    this.output(data); // this.emit('stdout', data.toString().replace(/\n/gi, ""));
-                })
-
-                cmd.stderr.on('data', (data) => {
-                    this.output(data); //this.emit('stderr', data.toString().replace(/\n/gi, ""));
-                })
-
-                cmd.on('error', (ex) => {
-                    err = ex;
-                })
-
-                cmd.on('close', (code) => {
-                    if (code != 0) {
-                        this.emit('close', code, err); reject(err || new Error('Adding repository to workspace failed (' + code + ')'));
                     }
                     else {
                         this.emit('close', 0, null); resolve();
@@ -350,38 +292,18 @@ namespace Sencha {
         }
 
         output(std: Buffer) {
-            var regex = /^(?:\[([A-Z]{3})\])?\s*(.+)$/mgi,
-                match;
-
-            while ((match = regex.exec(std.toString())) != null) {
-
-                switch (match[1]) {
-                    case "INF":
-                        this.emit('stdout', '\u001b[32m[INF]\u001b[39m ' + match[2] + '\n'); break;
-
-                    case "LOG":
-                        this.emit('stdout', '[LOG]' + ' ' + match[2] + '\n'); break;
-
-                    case "WARN":
-                        this.emit('stdout', '\u001b[33m[WARN]\u001b[39m ' + match[2] + '\n'); break;
-
-                    case "ERR":
-                        this.emit('stderr', '\u001b[31m[ERR]\u001b[39m ' + match[2] + '\n'); break;
-
-                    default:
-                        this.emit('stdout', match[2] + '\n'); break;
-                }
-            }
+            getSenchaOutput(std)
+                .forEach((line) => {
+                    this.emit('stdout', line + '\n');
+                })
         }
 
         build(callback?: (err: Error) => void) {
             var execute = new Promise((resolve, reject) => {
-
-
                 this.emit('stdout', 'Building "\u001b[36m' + this.name + '\u001b[39m"\n');
 
                 var err,
-                    cmd = proc.spawn(this.senchaCmd || 'sencha.exe', [/*'config', '-prop', 'workspace.build.dir="${workspace.dir}\\build"', 'then',*/ (this.type == ModuleType.Package ? 'package' : 'app'), 'build'], { cwd: path.dirname(this.location), env: process.env });
+                    cmd = proc.spawn(Sencha.cmd || 'sencha.exe', [/*'config', '-prop', 'workspace.build.dir="${workspace.dir}\\build"', 'then',*/ (this.type == ModuleType.Package ? 'package' : 'app'), 'build'], { cwd: path.dirname(this.location), env: process.env });
 
                 cmd.stdout.on('data', (data) => {
                     this.output(data);
@@ -420,13 +342,10 @@ namespace Sencha {
         }
     }
 
-    export function install(skip: boolean): Promise<string> {
+    export function install(url: string): Promise<string> {
         return new Promise((resolve, reject) => {
             try {
-                if (skip)
-                    return resolve(process.env.SENCHA_CMD || "sencha.exe")
-
-                download(process.env.SENCHACMD_URL || "http://cdn.sencha.com/cmd/6.1.0/jre/SenchaCmd-6.1.0-windows-32bit.zip")
+                download(url)
                     .then((executable) => {
                         var destination = path.normalize(os.tmpdir() + '/sencha-cmd/');
 
@@ -452,9 +371,7 @@ namespace Sencha {
                                 reject(err);
                             }
                             else {
-                                process.env.SENCHA_CMD = path.normalize(destination + "/sencha.exe");
-
-                                resolve(process.env.SENCHA_CMD);    
+                                resolve(path.normalize(destination + "/sencha.exe"));    
                             }
                         })
 
@@ -464,6 +381,71 @@ namespace Sencha {
                 reject(err);
             }
         });
+    }
+
+    export function addRepository(name: string, url: string, callback ?: (err: Error, output?: string) => void): Promise<string> {
+        var execute = new Promise<string>((resolve, reject) => {
+            var err, output = [],
+                cmd = proc.spawn(Sencha.cmd || 'sencha.exe', ['repository', 'add', name, url], { cwd: this.workspace, env: process.env });
+
+
+            cmd.stdout.on('data', (data) => {
+                output.push(getSenchaOutput(data)); 
+            })
+
+            cmd.stderr.on('data', (data) => {
+                output.push(getSenchaOutput(data)); 
+            })
+
+            cmd.on('error', (ex) => {
+                err = ex;
+            })
+
+            cmd.on('close', (code) => {
+                if (code != 0) {
+                    reject(err || new Error('Adding repository to workspace failed (' + code + ')'));
+                }
+                else {
+                    resolve(output.join('\n'));
+                }
+            })
+        });
+
+        if (callback != null) {
+            // callback
+            execute.then((output) => { callback(null, output); }).catch((err) => { callback(err); });
+        }
+        else {
+            // promise
+            return execute;
+        }
+    }
+
+    function getSenchaOutput(std: Buffer): string[] {
+        var regex = /^(?:\[([A-Z]{3})\])?\s*(.+)$/mgi,
+            match, output = [];
+
+        while ((match = regex.exec(std.toString())) != null) {
+
+            switch (match[1]) {
+                case "INF":
+                    output.push('\u001b[32m[INF]\u001b[39m ' + match[2]); break;
+
+                case "LOG":
+                    output.push('[LOG]' + ' ' + match[2]); break;
+
+                case "WARN":
+                    output.push('\u001b[33m[WARN]\u001b[39m ' + match[2]); break;
+
+                case "ERR":
+                    output.push('\u001b[31m[ERR]\u001b[39m ' + match[2]); break;
+
+                default:
+                    output.push(match[2]); break;
+            }
+        }
+
+        return output;
     }
 }
 
