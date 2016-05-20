@@ -19,7 +19,13 @@ program
             .then((cmd) => {
                 process.stdout.write('Sencha command installed at "' + cmd + '"\n');
 
+
+
                 options.parent.senchaCmd = process.env.SENCHACMD = cmd;
+
+                process.env.SENCHACMD = cmd
+
+
                 process.exit(0);
             })
             .catch((err) => {
