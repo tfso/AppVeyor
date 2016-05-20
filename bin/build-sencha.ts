@@ -17,7 +17,7 @@ program
 
         sencha.install(options.url)
             .then((cmd) => {
-                process.stdout.write('Sencha command installed at "' + cmd + '"');
+                process.stdout.write('Sencha command installed at "' + cmd + '"\n');
 
                 process.env.SENCHACMD = cmd;
                 process.exit(0);
@@ -35,7 +35,7 @@ program
 
         sencha.addRepository(name, url)
             .then((output) => {
-                process.stdout.write(output);
+                process.stdout.write(output + "\n");
                 process.exit(0);
             })
             .catch((err) => {
@@ -70,7 +70,7 @@ program
             .then(() => {
                 workspace.build()
                     .then(() => {
-                        process.stdout.write('\u001b[36mDone building\u001b[39m');
+                        process.stdout.write('\u001b[36mDone building\u001b[39m\n');
                         process.exit(0);
                     })
                     .catch((err) => {

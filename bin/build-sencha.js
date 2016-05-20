@@ -14,7 +14,7 @@ program
     process.stdout.write('Url: ' + options.url + '\n');
     sencha_1.default.install(options.url)
         .then(function (cmd) {
-        process.stdout.write('Sencha command installed at "' + cmd + '"');
+        process.stdout.write('Sencha command installed at "' + cmd + '"\n');
         process.env.SENCHACMD = cmd;
         process.exit(0);
     })
@@ -30,7 +30,7 @@ program
     sencha_1.default.cmd = options.senchaCmd;
     sencha_1.default.addRepository(name, url)
         .then(function (output) {
-        process.stdout.write(output);
+        process.stdout.write(output + "\n");
         process.exit(0);
     })
         .catch(function (err) {
@@ -60,7 +60,7 @@ program
         .then(function () {
         workspace.build()
             .then(function () {
-            process.stdout.write('\u001b[36mDone building\u001b[39m');
+            process.stdout.write('\u001b[36mDone building\u001b[39m\n');
             process.exit(0);
         })
             .catch(function (err) {
