@@ -15,7 +15,7 @@ program
     sencha_1.default.install(options.url)
         .then(function (cmd) {
         process.stdout.write('Sencha command installed at "' + cmd + '"\n');
-        process.env.SENCHACMD = cmd;
+        options.parent.senchaCmd = process.env.SENCHACMD = cmd;
         process.exit(0);
     })
         .catch(function (err) {
