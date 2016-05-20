@@ -113,7 +113,44 @@ namespace Sencha {
 
                 cmd.on('close', (code) => {
                     if (code != 0) {
-                        this.emit('close', code, err); reject(err);
+                        this.emit('close', code, err); reject(err || new Error('Upgrading workspace failed (' + code + ')'));
+                    }
+                    else {
+                        this.emit('close', 0, null); resolve();
+                    }
+                })
+            });
+
+            if (callback != null) {
+                // callback
+                execute.then(() => { callback(null); }).catch((err) => { callback(err); });
+            }
+            else {
+                // promise
+                return execute;
+            }
+        }
+
+        addRepository(name: string, url: string, callback?: (err: Error) => void) {
+            var execute = new Promise((resolve, reject) => {
+                var err,
+                    cmd = proc.spawn(this.senchaCmd || 'sencha.exe', ['repository', 'add', name, url], { cwd: this.workspace, env: process.env });
+
+                cmd.stdout.on('data', (data) => {
+                    this.output(data); // this.emit('stdout', data.toString().replace(/\n/gi, ""));
+                })
+
+                cmd.stderr.on('data', (data) => {
+                    this.output(data); //this.emit('stderr', data.toString().replace(/\n/gi, ""));
+                })
+
+                cmd.on('error', (ex) => {
+                    err = ex;
+                })
+
+                cmd.on('close', (code) => {
+                    if (code != 0) {
+                        this.emit('close', code, err); reject(err || new Error('Adding repository to workspace failed (' + code + ')'));
                     }
                     else {
                         this.emit('close', 0, null); resolve();
@@ -387,7 +424,7 @@ namespace Sencha {
         return new Promise((resolve, reject) => {
             try {
                 if (skip)
-                    return resolve("sencha.exe")
+                    return resolve(process.env.SENCHA_CMD || "sencha.exe")
 
                 download(process.env.SENCHACMD_URL || "http://cdn.sencha.com/cmd/6.1.0/jre/SenchaCmd-6.1.0-windows-32bit.zip")
                     .then((executable) => {
@@ -415,7 +452,9 @@ namespace Sencha {
                                 reject(err);
                             }
                             else {
-                                resolve(destination + "sencha.exe");    
+                                process.env.SENCHA_CMD = path.normalize(destination + "/sencha.exe");
+
+                                resolve(process.env.SENCHA_CMD);    
                             }
                         })
 
