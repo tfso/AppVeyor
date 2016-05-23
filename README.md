@@ -1,4 +1,4 @@
-﻿# AppVeyor Command-line tool for Sencha
+﻿# AppVeyor Command-line tools
 
 ## Installation
 
@@ -9,6 +9,13 @@
 You must have an AppVeyor account. The command lines is supposed to be run by AppVeyor in a build process in build scripts, normally in appveyor.yml configuration.
 
 ## Usage
+
+### path-version
+```
+  Usage: patch-version
+  
+  Pathes the version in package.json to the current build version provided by env:APPVEYOR_BUILD_VERSION
+```
 
 ### build-sencha --help
 ```
