@@ -8,6 +8,32 @@
 
 You must have an AppVeyor account. The command lines is supposed to be run by AppVeyor in a build process in build scripts, normally in appveyor.yml configuration.
 
+## Yaml
+AppVeyor configuration file 'appveyor.yml' can be configured to build Sencha projects by using the command line tool after installing this repository as global package as described above. See below for an example in yaml format, and the usage commands in next topic.
+
+```yaml
+environment:
+  nodejs_version: "4"
+  SENCHACMD_URL: http://cdn.sencha.com/cmd/6.1.2/jre/SenchaCmd-6.1.2-windows-32bit.zip
+  SENCHACMD_REPOSITORY: https://sencharepo.example.org/packages/
+branches:
+    only:
+      - master
+
+skip_tags: true
+
+install:
+  - ps: Install-Product node $env:nodejs_version
+  - node --version
+  - npm install -g tfso/AppVeyor#1.0.58
+
+build_script:
+  - build-sencha install --url %SENCHACMD_URL% --destination c:\tools\sencha-cmd\
+  - build-sencha repository tfso %SENCHACMD_REPOSITORY% --sencha-cmd c:\tools\sencha-cmd\sencha.exe
+  - build-sencha build --path %APPVEYOR_BUILD_FOLDER% --sencha-cmd c:\tools\sencha-cmd\sencha.exe
+  - build-sencha publish
+```
+
 ## Usage
 
 ### path-version
