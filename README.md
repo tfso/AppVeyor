@@ -1,4 +1,4 @@
-﻿# AppVeyor Command tool for Sencha
+﻿# AppVeyor Command-line tool for Sencha
 
 ## Installation
 
