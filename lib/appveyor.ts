@@ -52,7 +52,7 @@ namespace Appveyor {
 
         public get request() {
             return {
-                post: (path: string, content: Object) => { if (this._request != null) this._request.post(path, content); }
+                post: (path: string, content: Object) => { if (this._request != null) this._request.post(path, content, (err, response, body) => { } ); }
             }
         }
 
