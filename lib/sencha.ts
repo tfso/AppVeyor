@@ -20,7 +20,6 @@ namespace Sencha {
 
     export interface IConfiguration {
         path: string;
-        sdk?: string;
     }
 
     export interface IWorkspace extends NodeJS.EventEmitter {
@@ -184,7 +183,7 @@ namespace Sencha {
                                         return path.parse(file).base == 'package.json';
                                     })
                                     .map((file) => {
-                                        return new Sencha.Module({ path: file, senchaCmd: this.senchaCmd });
+                                        return new Sencha.Module({ path: file });
                                     });
                             }),
                         fsp
@@ -195,7 +194,7 @@ namespace Sencha {
                                         return path.parse(file).base == 'app.json';
                                     })
                                     .map((file) => {
-                                        return new Sencha.Module({ path: file, senchaCmd: this.senchaCmd });
+                                        return new Sencha.Module({ path: file });
                                     });
                             })
                     ]
@@ -237,13 +236,11 @@ namespace Sencha {
         name = ""
         location = null
         version = null
-        senchaCmd = ""  
 
         constructor(config: IConfiguration) {
             super();
 
             this.location = path.normalize(config.path);
-            this.senchaCmd = config.senchaCmd;
         }
 
         get type() {
@@ -342,13 +339,13 @@ namespace Sencha {
         }
     }
 
-    export function install(url: string): Promise<string> {
+    export function install(url: string, destination?: string): Promise<string> {
         return new Promise((resolve, reject) => {
             try {
                 download(url)
                     .then((executable) => {
-                        var destination = path.normalize(os.tmpdir() + '/sencha-cmd/');
-
+                        destination = (destination ? path.normalize(destination) : path.normalize(os.tmpdir() + '/sencha-cmd/'));
+                        
                         var err, 
                             cmd = proc.spawn(executable, ['-a', '-q', '-dir', destination], { });
 
@@ -371,7 +368,7 @@ namespace Sencha {
                                 reject(err);
                             }
                             else {
-                                resolve(path.normalize(destination + "/sencha.exe"));    
+                                resolve(path.normalize(destination + "/sencha.exe"));
                             }
                         })
 

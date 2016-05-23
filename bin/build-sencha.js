@@ -3,25 +3,19 @@
 var sencha_1 = require('./../lib/sencha');
 var path = require('path');
 var program = require('commander');
-var proc = require('child_process');
 program
     .version(process.env.npm_package_version || require('./../package.json').version)
-    .option('-c, --sencha-cmd <path>', 'Path to sencha command, either given by install or environment SENCHACMD', path.normalize, process.env.SENCHACMD || "sencha.exe");
+    .description('AppVeyor command-line tool for building Sencha (ExtJS) projects. Either provide path to sencha command with option, env:SENCHACMD')
+    .option('-c, --sencha-cmd <path>', 'Path to sencha command, either given by install or environment SENCHACMD, default: ' + (process.env.SENCHACMD || "sencha.exe"), path.normalize, process.env.SENCHACMD || "sencha.exe");
 program
     .command('install')
+    .description('The output to STDOUT is the path to sencha cmd, its executable')
     .option('-u, --url <url>', 'Url to sencha command sdk', process.env.SENCHACMD_URL || 'http://cdn.sencha.com/cmd/6.1.2/jre/SenchaCmd-6.1.2-windows-32bit.zip')
+    .option('-d, --destination <path>', 'The destionation path where sencha command should be install. If left out, it is install in temp.')
     .action(function (options) {
-    process.stdout.write('Installing Sencha Cmd\n');
-    process.stdout.write('Url: ' + options.url + '\n');
-    sencha_1.default.install(options.url)
+    sencha_1.default.install(options.url, options.destination)
         .then(function (cmd) {
-        process.stdout.write('Sencha command installed at "' + cmd + '"\n');
-        options.parent.senchaCmd = process.env.SENCHACMD = cmd;
-        process.env.SENCHACMD = cmd;
-        process.stdout.write('DEBUG:' + process.env.SENCHACMD);
-        proc.exec("SET SENCHACMD=" + cmd, {}, function () { });
-        process.stdout.write('DEBUG:' + process.env.SENCHACMD);
-        process.exit(0);
+        process.stdout.write(cmd);
     })
         .catch(function (err) {
         process.stderr.write(err);
@@ -35,7 +29,6 @@ program
     sencha_1.default.cmd = options.parent.senchaCmd;
     process.stdout.write('Adding repository for Sencha\n');
     process.stdout.write('Cmd: ' + options.parent.senchaCmd + '\n');
-    process.stdout.write('Cmd Env: ' + process.env.SENCHACMD + '\n');
     process.stdout.write('\n');
     sencha_1.default.addRepository(name, url)
         .then(function (output) {
@@ -65,7 +58,6 @@ program
     process.stdout.write('Building Sencha Project\n');
     process.stdout.write('Workspace: ' + workspace.workspace + '\n');
     process.stdout.write('Cmd: ' + sencha_1.default.cmd + '\n');
-    process.stdout.write('Cmd Env: ' + process.env.SENCHACMD + '\n');
     process.stdout.write('\n');
     workspace.upgrade()
         .then(function () {
@@ -76,15 +68,11 @@ program
         })
             .catch(function (err) {
             process.stdout.write("Failed; Workspace Build\n");
-            //if (err)
-            //    process.stdout.write(err || "");
             process.exit(1);
         });
     })
         .catch(function (err) {
         process.stdout.write("Failed; Workspace Upgrade\n");
-        //if (err)
-        //    process.stdout.write(err || "");
         process.exit(1);
     });
 });
