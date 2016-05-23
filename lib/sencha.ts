@@ -90,7 +90,7 @@ namespace Sencha {
                                 case ModuleType.Application:
                                     appveyor.BuildWorker.addMessage('Adding artifact for application ' + module.name + ' located at ' + path.normalize(buildPath + 'production/' + module.name));
 
-                                    appveyor.BuildWorker.addArtifact(path.normalize(buildPath + 'production/' + module.name), null, appveyor.ArtifactType.Zip);
+                                    appveyor.BuildWorker.addArtifact(path.normalize(buildPath + '/production/' + module.name), null, appveyor.ArtifactType.Zip);
 
                                     break;
 
