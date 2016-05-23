@@ -1,6 +1,8 @@
 ﻿#!/usr/bin/env node
 
 import sencha from './../lib/sencha';
+import appveyor from './../lib/appveyor';
+
 import path = require('path');
 import program = require('commander');
 import proc = require('child_process');
@@ -46,9 +48,26 @@ program
     })
 
 program
+    .command('publish')
+    .description('Publish packages to repository and making artifacts of apps')
+    .action((options) => {
+        console.log('publishing');
+        appveyor.BuildWorker.addMessage('test');
+
+
+        //var workspace = new sencha.Workspace({
+        //    path: options.path
+        //});
+
+        //workspace.publish();
+
+    })
+
+program
     .command('build')
     .description('Build all packages and apps in a workspace')
     .option('-p, --path <workspace>', 'Path to workspace', path.normalize, process.cwd())
+    //.option('-d, --destination [path]', 'Destination of build directory')
     .action((options) => {
         sencha.cmd = options.parent.senchaCmd
 

@@ -9,6 +9,8 @@ import async = require('async');
 import http = require('http');
 import unzip = require('unzip');
 
+import appveyor from './appveyor';
+
 namespace Sencha {
     
     export var cmd: string
@@ -20,6 +22,7 @@ namespace Sencha {
 
     export interface IConfiguration {
         path: string;
+        sdk?: string
     }
 
     export interface IWorkspace extends NodeJS.EventEmitter {
@@ -30,6 +33,7 @@ namespace Sencha {
 
         upgrade(callback?: (err: Error) => void): Promise<any>
         build(callback?: (err: Error) => void): Promise<any>
+        publish(callback?: (err: Error) => void): Promise<any>
     }
 
     export interface IModule extends NodeJS.EventEmitter {
@@ -53,7 +57,7 @@ namespace Sencha {
             super();
 
             this.workspace = path.normalize(config.path);
-            this.sdk = config.sdk ? path.normalize(config.sdk) : "";
+            this.sdk = config.sdk;
         }
 
         output(std: Buffer) {
@@ -70,6 +74,37 @@ namespace Sencha {
                         this.emit('stdout', line + '\n');
                     }  
                 })
+        }
+
+        publish(callback?: (err: Error) => void) {
+            var execute = new Promise((resolve, reject) => {
+                this
+                    .getModules()
+                    .then((modules) => {
+
+                        //process.env.APPVEYOR_API_URL
+
+
+                        modules.forEach((module) => {
+
+                        })
+
+                        this.emit('close', 0); resolve();
+                    })
+                    .catch((err) => {
+                        this.emit('close', -1, err); reject(err);
+                    })
+
+            });
+
+            if (callback != null) {
+                // callback
+                execute.then(() => { callback(null); }).catch((err) => { callback(err); });
+            }
+            else {
+                // promise
+                return execute;
+            }
         }
 
         upgrade(callback?: (err: Error) => void) {
@@ -368,6 +403,8 @@ namespace Sencha {
                                 reject(err);
                             }
                             else {
+                                appveyor.BuildWorker.addMessage('Installed Sencha Cmd at ' + destination);
+
                                 resolve(path.normalize(destination + "/sencha.exe"));
                             }
                         })

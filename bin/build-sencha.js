@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 "use strict";
 var sencha_1 = require('./../lib/sencha');
+var appveyor_1 = require('./../lib/appveyor');
 var path = require('path');
 var program = require('commander');
 program
@@ -39,6 +40,17 @@ program
         process.stderr.write(err);
         process.exit(1);
     });
+});
+program
+    .command('publish')
+    .description('Publish packages to repository and making artifacts of apps')
+    .action(function (options) {
+    console.log('publishing');
+    appveyor_1.default.BuildWorker.addMessage('test');
+    //var workspace = new sencha.Workspace({
+    //    path: options.path
+    //});
+    //workspace.publish();
 });
 program
     .command('build')
