@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 "use strict";
+var appveyor_1 = require('./../lib/appveyor');
 var patchVersion = require('./../lib/patch-version');
-var appveyor = require('./../lib/appveyor');
 var path = require('path');
 var program = require('commander');
 var file;
@@ -9,7 +9,7 @@ program
     .version(process.env.npm_package_version || require('./../package.json').version)
     .arguments('<file>')
     .description('AppVeyor command-line tool for patching version to a file, defaults to package.json')
-    .option('-b, --build-version [raw]', 'Version number in format 0.0.1 where it defaults to env:APPVEYOR_BUILD_VERSION', appveyor.getBuildVersion().toString())
+    .option('-b, --build-version [raw]', 'Version number in format 0.0.1 where it defaults to env:APPVEYOR_BUILD_VERSION', appveyor_1.default.getBuildVersion().toString())
     .action(function (f, options) {
     file = path.normalize(f);
 });
