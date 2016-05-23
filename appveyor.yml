@@ -8,26 +8,20 @@ branches:
 
 skip_tags: true
 
-# Install scripts. (runs after repo cloning)
 install:
   # Get the latest stable version of Node.js or io.js
   - ps: Install-Product node $env:nodejs_version
   # install modules
   - npm install
-  - ps: git config --global user.email "tfsobob@24sevenoffice.com"
-  - ps: git config --global user.name "tfsobob"
+  #- ps: git config --global user.email "tfsobob@24sevenoffice.com"
+  #- ps: git config --global user.name "tfsobob"
 
 build_script:
-  #- npm install -g patch-version
-  #- ps: $env:APPVEYOR_REPO_TAG_NAME = $env:appveyor_build_version # patch-version script uses appveyor_repo_tag_name as version
   - echo Patching version %appveyor_build_version%
   - node ./bin/patch-version
   
 # Post-install test scripts.
 before_test:
-  # Output useful info for debugging.
-  - node --version
-  - npm --version
   # install modules needed for testing
   - npm install -g mocha-appveyor-reporter
   - npm install -g mocha
