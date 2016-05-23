@@ -50,17 +50,13 @@ program
 program
     .command('publish')
     .description('Publish packages to repository and making artifacts of apps')
+    .option('-p, --path <workspace>', 'Path to workspace', path.normalize, process.cwd())
     .action((options) => {
-        console.log('publishing');
-        appveyor.BuildWorker.addMessage('test');
+        var workspace = new sencha.Workspace({
+            path: options.path
+        });
 
-
-        //var workspace = new sencha.Workspace({
-        //    path: options.path
-        //});
-
-        //workspace.publish();
-
+        workspace.publish();
     })
 
 program
