@@ -1,6 +1,12 @@
 ﻿import request = require('request-json');
 
 namespace Appveyor {
+    export enum ArtifactType {
+        NuGetPackage,
+        WebDeployPackage,
+        Auto,
+        Zip
+    }
 
     export interface IBuild {
         Major: number;
@@ -88,7 +94,11 @@ namespace Appveyor {
             //}            
         }
 
-        public static addArtifact(): void {
+        public static addArtifact(path: string, file?: string, type?: ArtifactType): void {
+            BuildWorker.getInstance()
+                .request
+                .post('api/artifacts', { path: path, fileName: file, type: type || ArtifactType.Auto });
+
             // POST api/artifacts
             //{
             //    "path": "c:\projects\myproject\mypackage.nupkg",

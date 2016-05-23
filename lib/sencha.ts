@@ -78,14 +78,27 @@ namespace Sencha {
 
         publish(callback?: (err: Error) => void) {
             var execute = new Promise((resolve, reject) => {
+
+                var buildPath = this.workspace + "/build"; // this may default to something else, check .sencha/workspace/sencha.cfg
+
                 this
                     .getModules()
                     .then((modules) => {
-
-                        //process.env.APPVEYOR_API_URL
-
-
                         modules.forEach((module) => {
+
+                            switch (module.type) {
+                                case ModuleType.Application:
+                                    appveyor.BuildWorker.addMessage('Adding artifact for application ' + module.name + ' located at ' + path.normalize(buildPath + 'production/' + module.name));
+
+                                    appveyor.BuildWorker.addArtifact(path.normalize(buildPath + 'production/' + module.name), null, appveyor.ArtifactType.Zip);
+
+                                    break;
+
+                                case ModuleType.Package:
+
+                                    break;
+                            }
+
 
                         })
 
