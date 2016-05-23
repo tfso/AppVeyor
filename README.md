@@ -12,9 +12,15 @@ You must have an AppVeyor account. The command lines is supposed to be run by Ap
 
 ### path-version
 ```
-  Usage: patch-version
-  
-  Pathes the version in package.json to the current build version provided by env:APPVEYOR_BUILD_VERSION
+  Usage: patch-version [options] <file>
+
+  AppVeyor command-line tool for patching version to a file, defaults to package.json
+
+  Options:
+
+    -h, --help                 output usage information
+    -V, --version              output the version number
+    -b, --build-version [raw]  Version number in format 0.0.1 where it defaults to env:APPVEYOR_BUILD_VERSION
 ```
 
 ### build-sencha --help

@@ -1,8 +1,8 @@
 ﻿import path = require('path');
 import fsp = require('../lib/fs-promise');
 
-function patchVersion(dir: string, file: string, version: string, log?: Function, error?: Function, exit?: Function): Promise<any> {
-    var packagePath = path.resolve(dir, './' + file);
+function patchVersion(file: string, version: string, log?: Function, error?: Function, exit?: Function): Promise<any> {
+    var packagePath = path.normalize(file);
 
     return fsp
         .readFile(packagePath)
