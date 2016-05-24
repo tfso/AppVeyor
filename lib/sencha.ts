@@ -90,13 +90,13 @@ namespace Sencha {
                                 case ModuleType.Application:
                                     appveyor.BuildWorker.addMessage('Adding artifact for application ' + module.name + ' located at ' + path.normalize(buildPath + 'production/' + module.name));
 
-                                    proc.exec("7z a " + module.name + ".zip  " + path.normalize(buildPath + '/production/' + module.name + '/*'), { cwd: this.workspace, env: process.env }, (err, stdout, stderr) => {
+                                    proc.exec("7z a " + module.name + ".zip " + path.normalize(buildPath + '/production/' + module.name + '/*'), { cwd: this.workspace, env: process.env }, (err, stdout, stderr) => {
                                         if (err)
                                             console.error(err);
 
                                         console.log(stdout);
 
-                                        appveyor.BuildWorker.addArtifact(module.name, "", module.name + ".zip", appveyor.ArtifactType.Zip);
+                                        appveyor.BuildWorker.addArtifact(module.name, this.workspace, module.name + ".zip", appveyor.ArtifactType.Zip);
                                     })
                                     
                                     break;
