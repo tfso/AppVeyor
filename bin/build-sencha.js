@@ -59,7 +59,7 @@ program
     .option('-j, --jsb <file>', 'Old style using the jsb that contains all of your project files')
     .action(function (options) {
     sencha_1.default.cmd = options.parent.senchaCmd;
-    if (options.jsb.length > 0) {
+    if (options.jsb && options.jsb.length > 0) {
         process.stdout.write('Building project file "\u001b[36m' + options.jsb + '\u001b[39m"\n');
         process.stdout.write('Destination: ' + options.destination + '\n');
         var err, cmd = proc.spawn(sencha_1.default.cmd || 'sencha.exe', ['build', '-p', path.normalize(options.jsb), '-d', path.normalize(options.destination)], { cwd: options.path, env: process.env });

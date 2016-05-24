@@ -68,7 +68,7 @@ program
     .action((options) => {
         sencha.cmd = options.parent.senchaCmd
 
-        if (options.jsb.length > 0) {
+        if (options.jsb && options.jsb.length > 0) {
             process.stdout.write('Building project file "\u001b[36m' + options.jsb + '\u001b[39m"\n');
             process.stdout.write('Destination: ' + options.destination + '\n');
 
