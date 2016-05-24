@@ -83,6 +83,12 @@ namespace Appveyor {
             //}
         }
 
+        public static addException(err: Error): void {
+            BuildWorker.getInstance()
+                .request
+                .post('api/build/messages', { message: err.name, details: err.message, category: 'error' });
+        }
+
         public static addTest(): void {
             // POST api/tests
             //{
@@ -99,20 +105,23 @@ namespace Appveyor {
         }
 
         public static addArtifact(name: string, source: string, filename?: string, type?: ArtifactType): void {
-            var location = path.parse(source);
+            var location = path.parse(source),
+                dir = path.normalize(location.dir + (location.ext ? '' : '/' + location.name));
 
             BuildWorker.getInstance()
                 .request
-                .post('api/artifacts', { name: name, path: path.normalize(location.dir + (location.ext ? '/' + location.name : '')), fileName: filename || name, type: (type ? ArtifactType[type] : ArtifactType[ArtifactType.Auto]) }, (err, response, uploadUrl) => {
-                    console.log(response.statusCode + ': ' + uploadUrl);
+                .post('api/artifacts', { name: name, path: dir, fileName: filename || location.base, type: (type ? ArtifactType[type] : ArtifactType[ArtifactType.Auto]) }, (err, response, uploadUrl) => {
+                    if (err)
+                        return this.addException(err);
 
+                    // we have a uploadUrl we can upload our artifact
                     switch (type) {
                         case ArtifactType.Zip:
                             
-                            console.log("7z a " + path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip") + " " + path.normalize(location.dir + (location.ext ? '/' + location.name : '')));
-                            proc.exec("7z a " + path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip") + " *", { cwd: path.normalize(location.dir + (location.ext ? '/' + location.name : '')), env: process.env }, (err, stdout, stderr) => {
+                            console.log("7z a " + path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip") + " " + dir);
+                            proc.exec("7z a " + path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip") + " *", { cwd: dir, env: process.env }, (err, stdout, stderr) => {
                                 if (err)
-                                    console.error(err);
+                                    return this.addException(err);
 
                                 console.log(stdout);
 
@@ -120,9 +129,9 @@ namespace Appveyor {
                                     .request
                                     .upload(uploadUrl, path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip"), (err, res, body) => {
                                         if (err)
-                                            console.error(err);
+                                            return this.addException(err);
 
-                                        console.log(response.statusCode + ': ' + JSON.stringify(body));
+                                        this.addMessage('Uploaded artifact ' + name + ' from ' + source);
                                     })
                             })
 
@@ -143,7 +152,7 @@ namespace Appveyor {
                                     .request
                                     .upload(uploadUrl, source, (err, res, body) => {
                                         if (err)
-                                            console.error(err);
+                                            return this.addException(err);
 
                                         console.log(response.statusCode + ': ' + JSON.stringify(body));
                                     })
@@ -152,12 +161,6 @@ namespace Appveyor {
                                 this.addMessage("Artifact " + name + " has type of Auto and the provided location is not a file " + location);
                             }
                     }
-
-
-                    
-                    
-
-
                 });
 
             // POST api/artifacts
