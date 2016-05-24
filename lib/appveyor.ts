@@ -83,13 +83,17 @@ namespace Appveyor {
             //}
         }
 
-        public static addException(message: string, err: Error): void {
+        public static addException(message: string, err: NodeJS.ErrnoException): void {
             BuildWorker.getInstance()
                 .request
                 .post('api/build/messages', { message: message, details: err.name + ': ' + err.message, category: 'error' });
         }
 
-        public static addTest(): void {
+        public static addTest(name: string, filename: string, framework?: string, duration?: number, err?: NodeJS.ErrnoException): void {
+            BuildWorker.getInstance()
+                .request
+                .post('api/tests', { testName: name, testFramework: framework, fileName: filename, outcome: err ? 'Failed' : 'Passed', durationMilliseconds: duration || 0, ErrorMessage: err ? err.message : "", ErrorStackTrace: err ? err.stack || "" : "" });
+
             // POST api/tests
             //{
             //    "testName": "Test A",
@@ -102,6 +106,18 @@ namespace Appveyor {
             //    "StdOut": "",
             //    "StdErr": ""
             //}            
+        }
+
+        public static setEnvironment(name: string, value: string): void {
+            BuildWorker.getInstance()
+                .request
+                .post('api/build/variables', { name: name, value: value});
+
+            // POST api/build/variables
+            // {
+            //    "name": "variable_name",
+            //    "value": "hello, world!"
+            //}
         }
 
         public static addArtifact(name: string, source: string, filename?: string, type?: ArtifactType): void {
