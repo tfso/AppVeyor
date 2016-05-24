@@ -94,10 +94,10 @@ namespace Appveyor {
             //}            
         }
 
-        public static addArtifact(path: string, file?: string, type?: ArtifactType): void {
+        public static addArtifact(name: string, path: string, file?: string, type?: ArtifactType): void {
             BuildWorker.getInstance()
                 .request
-                .post('api/artifacts', { path: path, fileName: file, type: (type ? ArtifactType[type] : ArtifactType[ArtifactType.Auto]) });
+                .post('api/artifacts', { name: name, path: path, fileName: file || "*", type: (type ? ArtifactType[type] : ArtifactType[ArtifactType.Auto]) });
 
             // POST api/artifacts
             //{
