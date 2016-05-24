@@ -16,7 +16,7 @@ program
     .action(function (options) {
     sencha_1.default.install(options.url, options.destination)
         .then(function (cmd) {
-        process.stdout.write(cmd);
+        process.stdout.write(cmd + '\n');
     })
         .catch(function (err) {
         process.stderr.write(err);
@@ -55,12 +55,13 @@ program
     .command('build')
     .description('Build all packages and apps in a workspace')
     .option('-p, --path <workspace>', 'Path to workspace', path.normalize, process.cwd())
-    .option('-d, --destination <path>', 'Destination of build directory')
+    .option('-d, --destination <path>', 'Destination of build directory', path.normalize, path.normalize(process.cwd() + '/build'))
     .option('-j, --jsb <file>', 'Old style using the jsb that contains all of your project files')
     .action(function (options) {
     sencha_1.default.cmd = options.parent.senchaCmd;
     if (options.jsb.length > 0) {
         process.stdout.write('Building project file "\u001b[36m' + options.jsb + '\u001b[39m"\n');
+        process.stdout.write('Destination: ' + options.destination + '\n');
         var err, cmd = proc.spawn(sencha_1.default.cmd || 'sencha.exe', ['build', '-p', path.normalize(options.jsb), '-d', path.normalize(options.destination)], { cwd: options.path, env: process.env });
         cmd.stdout.on('data', function (data) {
             process.stdout.write(data);
