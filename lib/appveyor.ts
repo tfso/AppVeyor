@@ -98,28 +98,64 @@ namespace Appveyor {
             //}            
         }
 
-        public static addArtifact(name: string, location: string, file?: string, type?: ArtifactType): void {
+        public static addArtifact(name: string, source: string, filename?: string, type?: ArtifactType): void {
+            var location = path.parse(source);
+
             BuildWorker.getInstance()
                 .request
-                .post('api/artifacts', { name: name, path: location, fileName: file || name, type: (type ? ArtifactType[type] : ArtifactType[ArtifactType.Auto]) }, (err, response, body) => {
-                    console.log(response.statusCode + ': ' + JSON.stringify(body));
-                    console.log("7z a " + path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip") + " " + path.normalize(location));
+                .post('api/artifacts', { name: name, path: path.normalize(location.dir + (location.ext ? '/' + location.name : '')), fileName: filename || name, type: (type ? ArtifactType[type] : ArtifactType[ArtifactType.Auto]) }, (err, response, uploadUrl) => {
+                    console.log(response.statusCode + ': ' + uploadUrl);
 
-                    proc.exec("7z a " + path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip") + " *", { cwd: location, env: process.env }, (err, stdout, stderr) => {
-                        if (err)
-                            console.error(err);
-
-                        console.log(stdout);
-
-                        BuildWorker.getInstance()
-                            .request
-                            .upload(body, path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip"), (err, res, body) => {
+                    switch (type) {
+                        case ArtifactType.Zip:
+                            
+                            console.log("7z a " + path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip") + " " + path.normalize(location.dir + (location.ext ? '/' + location.name : '')));
+                            proc.exec("7z a " + path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip") + " *", { cwd: path.normalize(location.dir + (location.ext ? '/' + location.name : '')), env: process.env }, (err, stdout, stderr) => {
                                 if (err)
                                     console.error(err);
 
-                                console.log(response.statusCode + ': ' + JSON.stringify(body));
+                                console.log(stdout);
+
+                                BuildWorker.getInstance()
+                                    .request
+                                    .upload(uploadUrl, path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip"), (err, res, body) => {
+                                        if (err)
+                                            console.error(err);
+
+                                        console.log(response.statusCode + ': ' + JSON.stringify(body));
+                                    })
                             })
-                    })
+
+                            break;
+
+                        case ArtifactType.WebDeployPackage:
+                            this.addMessage("Artifact " + name + " has type WebDeployPackage that isn't implemented");
+                            break;
+
+                        case ArtifactType.NuGetPackage:
+                            this.addMessage("Artifact " + name + " has type of NuGetPackage that isn't implemented");
+                            break;
+
+                        case ArtifactType.Auto:
+                            if (location.ext && location.base) {
+                                // we have a file
+                                BuildWorker.getInstance()
+                                    .request
+                                    .upload(uploadUrl, source, (err, res, body) => {
+                                        if (err)
+                                            console.error(err);
+
+                                        console.log(response.statusCode + ': ' + JSON.stringify(body));
+                                    })
+                            }
+                            else {
+                                this.addMessage("Artifact " + name + " has type of Auto and the provided location is not a file " + location);
+                            }
+                    }
+
+
+                    
+                    
 
 
                 });
