@@ -83,10 +83,10 @@ namespace Appveyor {
             //}
         }
 
-        public static addException(err: Error): void {
+        public static addException(message: string, err: Error): void {
             BuildWorker.getInstance()
                 .request
-                .post('api/build/messages', { message: err.name, details: err.message, category: 'error' });
+                .post('api/build/messages', { message: message, details: err.name + ': ' + err.message, category: 'error' });
         }
 
         public static addTest(): void {
@@ -110,9 +110,12 @@ namespace Appveyor {
 
             BuildWorker.getInstance()
                 .request
-                .post('api/artifacts', { name: name, path: dir, fileName: filename || location.base, type: (type ? ArtifactType[type] : ArtifactType[ArtifactType.Auto]) }, (err, response, uploadUrl) => {
+                .post('api/artifacts', { name: name, path: dir, fileName: filename || location.base, type: (type ? ArtifactType[type] : ArtifactType[ArtifactType.Auto]) }, (err, response, body) => {
                     if (err)
-                        return this.addException(err);
+                        return this.addException('Posting artifact ' + name + ' to appveyor failed', err);
+
+                    console.log(body);
+                    var uploadUrl = body;
 
                     // we have a uploadUrl we can upload our artifact
                     switch (type) {
@@ -121,7 +124,7 @@ namespace Appveyor {
                             console.log("7z a " + path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip") + " " + dir);
                             proc.exec("7z a " + path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip") + " *", { cwd: dir, env: process.env }, (err, stdout, stderr) => {
                                 if (err)
-                                    return this.addException(err);
+                                    return this.addException('Uploading artifact ' + name + ' failed', err);
 
                                 console.log(stdout);
 
@@ -129,7 +132,7 @@ namespace Appveyor {
                                     .request
                                     .upload(uploadUrl, path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip"), (err, res, body) => {
                                         if (err)
-                                            return this.addException(err);
+                                            return this.addException('Uploading artifact file "' + path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip") + '" to "' + uploadUrl + '" failed', err);
 
                                         this.addMessage('Uploaded artifact ' + name + ' from ' + source);
                                     })
@@ -152,9 +155,9 @@ namespace Appveyor {
                                     .request
                                     .upload(uploadUrl, source, (err, res, body) => {
                                         if (err)
-                                            return this.addException(err);
+                                            return this.addException('Uploading artifact file "' + path.normalize(source) + '" to "' + uploadUrl + '" failed', err);
 
-                                        console.log(response.statusCode + ': ' + JSON.stringify(body));
+                                        this.addMessage('Uploaded artifact ' + name + ' from "' + source + '"');
                                     })
                             }
                             else {
