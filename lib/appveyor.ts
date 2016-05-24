@@ -124,28 +124,44 @@ namespace Appveyor {
             var location = path.parse(source),
                 dir = path.normalize(location.dir + (location.ext ? '' : '/' + location.name));
 
+            process.stdout.write('\u001b[36mAdding artifact\u001b[39m ' + name + '...');
+
             BuildWorker.getInstance()
                 .request
                 .post('api/artifacts', { name: name, path: dir, fileName: filename || location.base, type: (type ? ArtifactType[type] : ArtifactType[ArtifactType.Auto]) }, (err, response, uploadUrl) => {
-                    if (err && response.statusCode > 299) // api/artifacts body isn't a valid json
+                    if (err && response.statusCode > 299) { // api/artifacts body isn't a valid json
+                        process.stdout.write('\u001b[31mFAILED\u001b[39m\n');
                         return this.addException('Posting artifact ' + name + ' to appveyor failed', err);
+                    }
+
+                    process.stdout.write('\u001b[32mOK\u001b[39m\n');
 
                     // we have a uploadUrl we can upload our artifact
                     switch (type) {
                         case ArtifactType.Zip:
                             
-                            console.log("7z a " + path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip") + " " + dir);
+                            //console.log("7z a " + path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip") + " " + dir);
+
+                            process.stdout.write('\u001b[36mZipping source\u001b[39m...');
+
                             proc.exec("7z a " + path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip") + " *", { cwd: dir, env: process.env }, (err, stdout, stderr) => {
-                                if (err)
+                                if (err) {
+                                    process.stdout.write('\u001b[31mFAILED\u001b[39m\n');
                                     return this.addException('Uploading artifact ' + name + ' failed', err);
+                                }
 
-                                console.log(stdout);
+                                process.stdout.write('\u001b[32mOK\u001b[39m\n');
 
+                                process.stdout.write('\u001b[36mUploading artifact\u001b[39m...');
                                 BuildWorker.getInstance()
                                     .request
                                     .upload(uploadUrl, path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip"), (err, res, body) => {
-                                        if (err)
+                                        if (err) {
+                                            process.stdout.write('\u001b[31mFAILED\u001b[39m\n');
                                             return this.addException('Uploading artifact file "' + path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip") + '" to "' + uploadUrl + '" failed', err);
+                                        }
+
+                                        process.stdout.write('\u001b[32mOK\u001b[39m\n');
 
                                         this.addMessage('Uploaded artifact ' + name + ' from ' + source);
                                     })
@@ -163,17 +179,24 @@ namespace Appveyor {
 
                         case ArtifactType.Auto:
                             if (location.ext && location.base) {
+
+                                process.stdout.write('\u001b[36mUploading artifact\u001b[39m...');
+
                                 // we have a file
                                 BuildWorker.getInstance()
                                     .request
                                     .upload(uploadUrl, source, (err, res, body) => {
-                                        if (err)
+                                        if (err) {
+                                            process.stdout.write('\u001b[31mFAILED\u001b[39m\n');
                                             return this.addException('Uploading artifact file "' + path.normalize(source) + '" to "' + uploadUrl + '" failed', err);
+                                        }
+                                        process.stdout.write('\u001b[32mOK\u001b[39m\n');
 
                                         this.addMessage('Uploaded artifact ' + name + ' from "' + source + '"');
                                     })
                             }
                             else {
+                                process.stdout.write('\u001b[36mUploading artifact\u001b[39m...\u001b[31mFAILED\u001b[39m\n');
                                 this.addMessage("Artifact " + name + " has type of Auto and the provided location is not a file " + location);
                             }
                     }
