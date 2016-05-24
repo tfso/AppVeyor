@@ -103,8 +103,9 @@ namespace Appveyor {
                 .request
                 .post('api/artifacts', { name: name, path: location, fileName: file || name, type: (type ? ArtifactType[type] : ArtifactType[ArtifactType.Auto]) }, (err, response, body) => {
                     console.log(response.statusCode + ': ' + JSON.stringify(body));
+                    console.log("7z a " + path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip") + " " + path.normalize(location));
 
-                    proc.exec("7z a " + path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip") + " " + path.normalize(location), { env: process.env }, (err, stdout, stderr) => {
+                    proc.exec("7z a " + path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip") + " *", { cwd: location, env: process.env }, (err, stdout, stderr) => {
                         if (err)
                             console.error(err);
 
