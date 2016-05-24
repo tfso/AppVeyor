@@ -100,6 +100,20 @@ build_script:
 
   Options:
 
+    -h, --help                output usage information
+    -p, --path <workspace>    Path to workspace
+    -d, --destination <path>  Destination of build directory
+    -j, --jsb <file>          Old style using the jsb that contains all of your project files
+```
+
+### build-sencha publish --help
+```
+  Usage: publish [options]
+
+  Publish packages to repository and making artifacts of apps
+
+  Options:
+
     -h, --help              output usage information
     -p, --path <workspace>  Path to workspace
 ```

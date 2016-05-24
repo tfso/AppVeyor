@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 "use strict";
+var _this = this;
 var sencha_1 = require('./../lib/sencha');
 var path = require('path');
 var program = require('commander');
+var proc = require('child_process');
 program
     .version(process.env.npm_package_version || require('./../package.json').version)
     .description('AppVeyor command-line tool for building Sencha (ExtJS) projects. Either provide path to sencha command with option, env:SENCHACMD')
@@ -54,37 +56,58 @@ program
     .command('build')
     .description('Build all packages and apps in a workspace')
     .option('-p, --path <workspace>', 'Path to workspace', path.normalize, process.cwd())
+    .option('-d, --destination <path>', 'Destination of build directory')
+    .option('-j, --jsb <file>', 'Old style using the jsb that contains all of your project files')
     .action(function (options) {
     sencha_1.default.cmd = options.parent.senchaCmd;
-    var workspace = new sencha_1.default.Workspace({
-        path: options.path
-    });
-    workspace.on('stdout', function (data) {
-        process.stdout.write(data);
-    });
-    workspace.on('stderr', function (data) {
-        process.stderr.write(data);
-    });
-    process.stdout.write('Building Sencha Project\n');
-    process.stdout.write('Workspace: ' + workspace.workspace + '\n');
-    process.stdout.write('Cmd: ' + sencha_1.default.cmd + '\n');
-    process.stdout.write('\n');
-    workspace.upgrade()
-        .then(function () {
-        workspace.build()
+    if (options.jsb.length > 0) {
+        process.stdout.write('Building project file "\u001b[36m' + options.jsb + '\u001b[39m"\n');
+        var err, cmd = proc.spawn(sencha_1.default.cmd || 'sencha.exe', ['build', '-p', path.normalize(options.jsb), '-d', path.normalize(options.destination)], { cwd: options.path, env: process.env });
+        cmd.stdout.on('data', function (data) {
+            _this.output(data);
+        });
+        cmd.stderr.on('data', function (data) {
+            _this.output(data);
+        });
+        cmd.on('error', function (ex) {
+            err = ex;
+        });
+        cmd.on('close', function (code) {
+            process.exit(code);
+        });
+    }
+    else {
+        var workspace = new sencha_1.default.Workspace({
+            path: options.path,
+            buildPath: options.destination
+        });
+        workspace.on('stdout', function (data) {
+            process.stdout.write(data);
+        });
+        workspace.on('stderr', function (data) {
+            process.stderr.write(data);
+        });
+        process.stdout.write('Building Sencha Project\n');
+        process.stdout.write('Workspace: ' + workspace.workspace + '\n');
+        process.stdout.write('Cmd: ' + sencha_1.default.cmd + '\n');
+        process.stdout.write('\n');
+        workspace.upgrade()
             .then(function () {
-            process.stdout.write('\u001b[36mDone building\u001b[39m\n');
-            process.exit(0);
+            workspace.build()
+                .then(function () {
+                process.stdout.write('\u001b[36mDone building\u001b[39m\n');
+                process.exit(0);
+            })
+                .catch(function (err) {
+                process.stdout.write("Failed; Workspace Build\n");
+                process.exit(1);
+            });
         })
             .catch(function (err) {
-            process.stdout.write("Failed; Workspace Build\n");
+            process.stdout.write("Failed; Workspace Upgrade\n");
             process.exit(1);
         });
-    })
-        .catch(function (err) {
-        process.stdout.write("Failed; Workspace Upgrade\n");
-        process.exit(1);
-    });
+    }
 });
 program
     .command('*')

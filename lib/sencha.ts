@@ -22,6 +22,7 @@ namespace Sencha {
 
     export interface IConfiguration {
         path: string;
+        buildPath?: string;
         sdk?: string
     }
 
@@ -49,6 +50,7 @@ namespace Sencha {
     export class Workspace extends events.EventEmitter implements IWorkspace {
         workspace = ""
         sdk = ""
+        buildPath = ""
         senchaCmd = ""
 
         _lastOutputWithLF = false
@@ -228,7 +230,7 @@ namespace Sencha {
                                         return path.parse(file).base == 'package.json';
                                     })
                                     .map((file) => {
-                                        return new Sencha.Module({ path: file });
+                                        return new Sencha.Module({ path: file, buildPath: this.buildPath });
                                     });
                             }),
                         fsp
@@ -239,7 +241,7 @@ namespace Sencha {
                                         return path.parse(file).base == 'app.json';
                                     })
                                     .map((file) => {
-                                        return new Sencha.Module({ path: file });
+                                        return new Sencha.Module({ path: file, buildPath: this.buildPath });
                                     });
                             })
                     ]

@@ -63,43 +63,69 @@ program
     .command('build')
     .description('Build all packages and apps in a workspace')
     .option('-p, --path <workspace>', 'Path to workspace', path.normalize, process.cwd())
-    //.option('-d, --destination [path]', 'Destination of build directory')
+    .option('-d, --destination <path>', 'Destination of build directory')
+    .option('-j, --jsb <file>', 'Old style using the jsb that contains all of your project files')
     .action((options) => {
         sencha.cmd = options.parent.senchaCmd
 
-        var workspace = new sencha.Workspace({
-            path: options.path
-        });
+        if (options.jsb.length > 0) {
+            process.stdout.write('Building project file "\u001b[36m' + options.jsb + '\u001b[39m"\n');
 
-        workspace.on('stdout', (data) => {
-            process.stdout.write(data);
-        });
+            var err,
+                cmd = proc.spawn(sencha.cmd || 'sencha.exe', ['build', '-p', path.normalize(options.jsb), '-d', path.normalize(options.destination)], { cwd: options.path, env: process.env });
 
-        workspace.on('stderr', (data) => {
-            process.stderr.write(data);
-        });
-
-        process.stdout.write('Building Sencha Project\n');
-        process.stdout.write('Workspace: ' + workspace.workspace + '\n');
-        process.stdout.write('Cmd: ' + sencha.cmd + '\n');
-        process.stdout.write('\n');
-
-        workspace.upgrade()
-            .then(() => {
-                workspace.build()
-                    .then(() => {
-                        process.stdout.write('\u001b[36mDone building\u001b[39m\n');
-                        process.exit(0);
-                    })
-                    .catch((err) => {
-                        process.stdout.write("Failed; Workspace Build\n");
-                        process.exit(1);  
-                    })
+            cmd.stdout.on('data', (data) => {
+                this.output(data);
             })
-            .catch((err) => {
-                process.stdout.write("Failed; Workspace Upgrade\n");
-                process.exit(1);
+
+            cmd.stderr.on('data', (data) => {
+                this.output(data);
             })
+
+            cmd.on('error', (ex) => {
+                err = ex;
+            })
+
+            cmd.on('close', (code) => {
+                process.exit(code)
+            })
+        }
+        else {
+            var workspace = new sencha.Workspace({
+                path: options.path,
+                buildPath: options.destination
+            });
+
+            workspace.on('stdout', (data) => {
+                process.stdout.write(data);
+            });
+
+            workspace.on('stderr', (data) => {
+                process.stderr.write(data);
+            });
+
+            process.stdout.write('Building Sencha Project\n');
+            process.stdout.write('Workspace: ' + workspace.workspace + '\n');
+            process.stdout.write('Cmd: ' + sencha.cmd + '\n');
+            process.stdout.write('\n');
+
+            workspace.upgrade()
+                .then(() => {
+                    workspace.build()
+                        .then(() => {
+                            process.stdout.write('\u001b[36mDone building\u001b[39m\n');
+                            process.exit(0);
+                        })
+                        .catch((err) => {
+                            process.stdout.write("Failed; Workspace Build\n");
+                            process.exit(1);
+                        })
+                })
+                .catch((err) => {
+                    process.stdout.write("Failed; Workspace Upgrade\n");
+                    process.exit(1);
+                })
+        }
     })
 
 program
