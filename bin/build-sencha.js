@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 "use strict";
-var _this = this;
 var sencha_1 = require('./../lib/sencha');
 var path = require('path');
 var program = require('commander');
@@ -64,10 +63,10 @@ program
         process.stdout.write('Building project file "\u001b[36m' + options.jsb + '\u001b[39m"\n');
         var err, cmd = proc.spawn(sencha_1.default.cmd || 'sencha.exe', ['build', '-p', path.normalize(options.jsb), '-d', path.normalize(options.destination)], { cwd: options.path, env: process.env });
         cmd.stdout.on('data', function (data) {
-            _this.output(data);
+            process.stdout.write(data);
         });
         cmd.stderr.on('data', function (data) {
-            _this.output(data);
+            process.stdout.write(data);
         });
         cmd.on('error', function (ex) {
             err = ex;

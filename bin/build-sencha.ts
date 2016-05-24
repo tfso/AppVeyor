@@ -75,11 +75,11 @@ program
                 cmd = proc.spawn(sencha.cmd || 'sencha.exe', ['build', '-p', path.normalize(options.jsb), '-d', path.normalize(options.destination)], { cwd: options.path, env: process.env });
 
             cmd.stdout.on('data', (data) => {
-                this.output(data);
+                process.stdout.write(data);
             })
 
             cmd.stderr.on('data', (data) => {
-                this.output(data);
+                process.stdout.write(data);
             })
 
             cmd.on('error', (ex) => {
