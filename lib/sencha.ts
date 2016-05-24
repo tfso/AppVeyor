@@ -79,7 +79,7 @@ namespace Sencha {
         publish(callback?: (err: Error) => void) {
             var execute = new Promise((resolve, reject) => {
 
-                var buildPath = this.workspace + "/build"; // this may default to something else, check .sencha/workspace/sencha.cfg
+                var buildPath = this.workspace + "/build/"; // this may default to something else, check .sencha/workspace/sencha.cfg
 
                 this
                     .getModules()
@@ -88,11 +88,11 @@ namespace Sencha {
 
                             switch (module.type) {
                                 case ModuleType.Application:
-                                    appveyor.BuildWorker.addArtifact(module.name, path.normalize(buildPath + '/production/' + module.name + '/'), module.name + ".zip", appveyor.ArtifactType.Zip);
+                                    appveyor.BuildWorker.addArtifact(module.name, path.normalize(buildPath + 'production/' + module.name + '/'), module.name + ".zip", appveyor.ArtifactType.Zip);
                                     break;
 
                                 case ModuleType.Package:
-
+                                    appveyor.BuildWorker.addArtifact(module.name, path.normalize(buildPath + module.name + '/' + module.name + ".pkg"), module.name + ".pkg", appveyor.ArtifactType.Auto);
                                     break;
                             }
 

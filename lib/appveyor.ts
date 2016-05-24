@@ -11,7 +11,7 @@ namespace Appveyor {
         Zip
     }
 
-    export interface IBuild {
+    export interface IBuildNumber {
         Major: number;
         Minor: number;
         Revision?: number;
@@ -20,7 +20,7 @@ namespace Appveyor {
         toString: () => string; 
     }
 
-    export class Build implements IBuild {
+    export class BuildNumber implements IBuildNumber {
         Major = 0;
         Minor = 0;
         Revision = 0;
@@ -189,7 +189,7 @@ namespace Appveyor {
         }
     }
 
-    export function getBuildVersion(): Appveyor.IBuild {
+    export function getBuildVersion(): Appveyor.IBuildNumber {
         var variables = [
             'APPVEYOR_BUILD_VERSION',
             'APPVEYOR_REPO_TAG_NAME'
@@ -203,7 +203,7 @@ namespace Appveyor {
                 return variable !== undefined && variable.length > 0;
             })[0] || '0.0.1';
 
-        return new Appveyor.Build(versionRaw);
+        return new Appveyor.BuildNumber(versionRaw);
     }
 }
 
