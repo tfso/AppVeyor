@@ -1,4 +1,7 @@
 ﻿import request = require('request-json');
+import os = require('os');
+import path = require('path');
+import proc = require('child_process');
 
 namespace Appveyor {
     export enum ArtifactType {
@@ -58,7 +61,8 @@ namespace Appveyor {
 
         public get request() {
             return {
-                post: (path: string, content: Object) => { if (this._request != null) this._request.post(path, content, (err, response, body) => { console.log(response.statusCode + ': ' + JSON.stringify(body)); } ); }
+                post: (path: string, content: Object, cb?: (err: any, response: any, body: any) => void) => { if (this._request != null) this._request.post(path, content, cb); },
+                upload: (path: string, filename: string, cb?: (err: any, response: any, body: any) => void) => { if (this._request != null) this._request.sendFile(path, filename, cb); }
             }
         }
 
@@ -94,10 +98,30 @@ namespace Appveyor {
             //}            
         }
 
-        public static addArtifact(name: string, path: string, file?: string, type?: ArtifactType): void {
+        public static addArtifact(name: string, location: string, file?: string, type?: ArtifactType): void {
             BuildWorker.getInstance()
                 .request
-                .post('api/artifacts', { name: name, path: path, fileName: file || name, type: (type ? ArtifactType[type] : ArtifactType[ArtifactType.Auto]) });
+                .post('api/artifacts', { name: name, path: location, fileName: file || name, type: (type ? ArtifactType[type] : ArtifactType[ArtifactType.Auto]) }, (err, response, body) => {
+                    console.log(response.statusCode + ': ' + JSON.stringify(body));
+
+                    proc.exec("7z a " + path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip") + " " + path.normalize(location), { env: process.env }, (err, stdout, stderr) => {
+                        if (err)
+                            console.error(err);
+
+                        console.log(stdout);
+
+                        BuildWorker.getInstance()
+                            .request
+                            .upload(body, path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip"), (err, res, body) => {
+                                if (err)
+                                    console.error(err);
+
+                                console.log(response.statusCode + ': ' + JSON.stringify(body));
+                            })
+                    })
+
+
+                });
 
             // POST api/artifacts
             //{
