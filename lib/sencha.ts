@@ -86,22 +86,29 @@ namespace Sencha {
                 this
                     .getModules()
                     .then((modules) => {
-                        modules.forEach((module) => {
 
-                            switch (module.type) {
-                                case ModuleType.Application:
-                                    appveyor.BuildWorker.addArtifact(module.name, path.normalize(buildPath + 'production/' + module.name + '/'), module.name + ".zip", appveyor.ArtifactType.Zip);
-                                    break;
+                        var err = null;
+                        async.everyLimit<IModule>(
+                            modules, 1,
+                            (module, cb) => {
+                                switch (module.type) {
+                                    case ModuleType.Application:
+                                        appveyor.BuildWorker.addArtifact(module.name, path.normalize(buildPath + 'production/' + module.name + '/'), module.name + ".zip", appveyor.ArtifactType.Zip, () => { cb("", true); });
+                                        break;
 
-                                case ModuleType.Package:
-                                    appveyor.BuildWorker.addArtifact(module.name, path.normalize(buildPath + module.name + '/' + module.name + ".pkg"), module.name + ".pkg", appveyor.ArtifactType.Auto);
-                                    break;
-                            }
-
-
-                        })
-
-                        this.emit('close', 0); resolve();
+                                    case ModuleType.Package:
+                                        appveyor.BuildWorker.addArtifact(module.name, path.normalize(buildPath + module.name + '/' + module.name + ".pkg"), module.name + ".pkg", appveyor.ArtifactType.Auto, () => { cb("", true); });
+                                        break;
+                                }
+                            },
+                            (message, result) => {
+                                if (err) {
+                                    this.emit('close', -1, err); reject(err);
+                                }
+                                else {
+                                    this.emit('close', 0); resolve();
+                                }
+                            });
                     })
                     .catch((err) => {
                         this.emit('close', -1, err); reject(err);

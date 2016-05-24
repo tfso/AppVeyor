@@ -120,7 +120,7 @@ namespace Appveyor {
             //}
         }
 
-        public static addArtifact(name: string, source: string, filename?: string, type?: ArtifactType): void {
+        public static addArtifact(name: string, source: string, filename?: string, type?: ArtifactType, cb?: (err: any) => void): void {
             var location = path.parse(source),
                 dir = path.normalize(location.dir + (location.ext ? '' : '/' + location.name));
 
@@ -131,7 +131,9 @@ namespace Appveyor {
                 .post('api/artifacts', { name: name, path: dir, fileName: filename || location.base, type: (type ? ArtifactType[type] : ArtifactType[ArtifactType.Auto]) }, (err, response, uploadUrl) => {
                     if (err && response.statusCode > 299) { // api/artifacts body isn't a valid json
                         process.stdout.write('\u001b[31mFAILED\u001b[39m\n');
-                        return this.addException('Posting artifact ' + name + ' to appveyor failed', err);
+                        this.addException('Posting artifact ' + name + ' to appveyor failed', err);
+
+                        cb(err);
                     }
 
                     process.stdout.write('\u001b[32mOK\u001b[39m\n');
@@ -147,7 +149,9 @@ namespace Appveyor {
                             proc.exec("7z a " + path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip") + " *", { cwd: dir, env: process.env }, (err, stdout, stderr) => {
                                 if (err) {
                                     process.stdout.write('\u001b[31mFAILED\u001b[39m\n');
-                                    return this.addException('Uploading artifact ' + name + ' failed', err);
+                                    this.addException('Uploading artifact ' + name + ' failed', err);
+
+                                    cb(err);
                                 }
 
                                 process.stdout.write('\u001b[32mOK\u001b[39m\n');
@@ -158,12 +162,16 @@ namespace Appveyor {
                                     .upload(uploadUrl, path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip"), (err, res, body) => {
                                         if (err) {
                                             process.stdout.write('\u001b[31mFAILED\u001b[39m\n');
-                                            return this.addException('Uploading artifact file "' + path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip") + '" to "' + uploadUrl + '" failed', err);
+                                            this.addException('Uploading artifact file "' + path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip") + '" to "' + uploadUrl + '" failed', err);
+
+                                            return cb(err);
                                         }
 
                                         process.stdout.write('\u001b[32mOK\u001b[39m\n');
 
                                         this.addMessage('Uploaded artifact ' + name + ' from ' + source);
+
+                                        cb(null);
                                     })
                             })
 
@@ -171,10 +179,14 @@ namespace Appveyor {
 
                         case ArtifactType.WebDeployPackage:
                             this.addMessage("Artifact " + name + " has type WebDeployPackage that isn't implemented");
+                            cb(null);
+
                             break;
 
                         case ArtifactType.NuGetPackage:
                             this.addMessage("Artifact " + name + " has type of NuGetPackage that isn't implemented");
+                            cb(null);
+
                             break;
 
                         case ArtifactType.Auto:
@@ -188,16 +200,22 @@ namespace Appveyor {
                                     .upload(uploadUrl, source, (err, res, body) => {
                                         if (err) {
                                             process.stdout.write('\u001b[31mFAILED\u001b[39m\n');
-                                            return this.addException('Uploading artifact file "' + path.normalize(source) + '" to "' + uploadUrl + '" failed', err);
+                                            this.addException('Uploading artifact file "' + path.normalize(source) + '" to "' + uploadUrl + '" failed', err);
+
+                                            cb(err);
                                         }
                                         process.stdout.write('\u001b[32mOK\u001b[39m\n');
 
                                         this.addMessage('Uploaded artifact ' + name + ' from "' + source + '"');
+
+                                        cb(null);
                                     })
                             }
                             else {
                                 process.stdout.write('\u001b[36mUploading artifact\u001b[39m...\u001b[31mFAILED\u001b[39m\n');
                                 this.addMessage("Artifact " + name + " has type of Auto and the provided location is not a file " + location);
+
+                                cb(null);
                             }
                     }
                 });
