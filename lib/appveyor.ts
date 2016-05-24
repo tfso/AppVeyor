@@ -110,12 +110,9 @@ namespace Appveyor {
 
             BuildWorker.getInstance()
                 .request
-                .post('api/artifacts', { name: name, path: dir, fileName: filename || location.base, type: (type ? ArtifactType[type] : ArtifactType[ArtifactType.Auto]) }, (err, response, body) => {
-                    if (err)
+                .post('api/artifacts', { name: name, path: dir, fileName: filename || location.base, type: (type ? ArtifactType[type] : ArtifactType[ArtifactType.Auto]) }, (err, response, uploadUrl) => {
+                    if (err && response.statusCode > 299) // api/artifacts body isn't a valid json
                         return this.addException('Posting artifact ' + name + ' to appveyor failed', err);
-
-                    console.log(body);
-                    var uploadUrl = body;
 
                     // we have a uploadUrl we can upload our artifact
                     switch (type) {
