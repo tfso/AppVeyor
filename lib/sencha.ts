@@ -103,10 +103,10 @@ namespace Sencha {
                                             process.stdout.write('\u001b[36mUploading artifact \u001b[39m' + module.name + ' \u001b[36mto remote repository\u001b[39m...');
                                             var req = request.createClient(url);
 
-                                            req.sendFile('', buildPath + module.name + '/' + module.name + ".pkg", (ex) => {
-                                                if (ex) {
+                                            req.sendFile('', buildPath + module.name + '/' + module.name + ".pkg", (ex, res, body) => {
+                                                if (ex || res.statusCode > 299) {
                                                     process.stdout.write('\u001b[31mFAILED\u001b[39m\n');
-                                                    appveyor.BuildWorker.addException('Uploading artifact ' + module.name + ' failed', ex);
+                                                    appveyor.BuildWorker.addException('Uploading artifact ' + module.name + ' failed', ex || new Error(body))
 
                                                     err = ex;
                                                 }
