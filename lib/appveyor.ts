@@ -133,7 +133,7 @@ namespace Appveyor {
                         process.stdout.write('\u001b[31mFAILED\u001b[39m\n');
                         this.addException('Posting artifact ' + name + ' to appveyor failed', err);
 
-                        cb(err);
+                        return cb(err);
                     }
 
                     process.stdout.write('\u001b[32mOK\u001b[39m\n');
@@ -151,7 +151,7 @@ namespace Appveyor {
                                     process.stdout.write('\u001b[31mFAILED\u001b[39m\n');
                                     this.addException('Uploading artifact ' + name + ' failed', err);
 
-                                    cb(err);
+                                    return cb(err);
                                 }
 
                                 process.stdout.write('\u001b[32mOK\u001b[39m\n');
