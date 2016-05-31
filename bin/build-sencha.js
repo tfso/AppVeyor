@@ -42,14 +42,16 @@ program
     });
 });
 program
-    .command('publish')
-    .description('Publish packages to repository and making artifacts of apps')
+    .command('publish [url]')
+    .description('Publishing artifacts of apps and packages to appveyor, but if url is defined will packages be posted to repository instead')
     .option('-p, --path <workspace>', 'Path to workspace', path.normalize, process.cwd())
-    .action(function (options) {
+    .action(function (url, options) {
     var workspace = new sencha_1.default.Workspace({
         path: options.path
     });
-    workspace.publish();
+    workspace.publish(url)
+        .then(function () { process.exit(0); })
+        .catch(function () { process.exit(1); });
 });
 program
     .command('build')

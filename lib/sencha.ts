@@ -7,7 +7,9 @@ import events = require('events');
 import async = require('async');
 
 import http = require('http');
+
 import unzip = require('unzip');
+import request = require('request-json');
 
 import appveyor from './appveyor';
 
@@ -78,7 +80,7 @@ namespace Sencha {
                 })
         }
 
-        publish(callback?: (err: Error) => void) {
+        publish(url?: string, callback?: (err: Error) => void) {
             var execute = new Promise((resolve, reject) => {
 
                 var buildPath = this.workspace + "/build/"; // this may default to something else, check .sencha/workspace/sencha.cfg
@@ -86,7 +88,7 @@ namespace Sencha {
                 this
                     .getModules()
                     .then((modules) => {
-
+                        
                         var err = null;
                         async.everyLimit<IModule>(
                             modules, 1,
@@ -97,7 +99,28 @@ namespace Sencha {
                                         break;
 
                                     case ModuleType.Package:
-                                        appveyor.BuildWorker.addArtifact(module.name, path.normalize(buildPath + module.name + '/' + module.name + ".pkg"), module.name + ".pkg", appveyor.ArtifactType.Auto, () => { cb("", true); });
+                                        if (url) {                                            
+                                            process.stdout.write('\u001b[36mUploading artifact \u001b[39m' + module.name + ' \u001b[36mto remote repository\u001b[39m...');
+                                            var req = request.createClient(url);
+
+                                            req.sendFile('', buildPath + module.name + '/' + module.name + ".pkg", (ex) => {
+                                                if (ex) {
+                                                    process.stdout.write('\u001b[31mFAILED\u001b[39m\n');
+                                                    appveyor.BuildWorker.addException('Uploading artifact ' + module.name + ' failed', ex);
+
+                                                    err = ex;
+                                                }
+                                                else {
+                                                    process.stdout.write('\u001b[32mOK\u001b[39m\n');
+                                                }
+                                                    
+                                                cb("", true);
+                                            });
+                                           
+                                        } else {
+                                            appveyor.BuildWorker.addArtifact(module.name, path.normalize(buildPath + module.name + '/' + module.name + ".pkg"), module.name + ".pkg", appveyor.ArtifactType.Auto, () => { cb("", true); });
+                                        }
+                                
                                         break;
                                 }
                             },
