@@ -31,7 +31,7 @@ namespace Appveyor {
         constructor(version: string) {
             var match: Array<any>;
 
-            match = /(\d+)\.(\d+)(?:\.(\d+))?\.(\d+)/ig.exec(version);
+            match = /(\d+)\.(\d+)\.(\d+)(?:\.(\d+))?/ig.exec(version);
             if (match) {
                 if (isNaN(match[1]) == false) this._major = parseInt(match[1]);
                 if (isNaN(match[2]) == false) this._minor = parseInt(match[2]);
@@ -286,7 +286,7 @@ namespace Appveyor {
             );
         } else {
             buildVersion = new Appveyor.BuildVersion(rawversion);
-            buildVersion.Build = parseInt(process.env['APPVEYOR_BUILD_NUMBER']) || 1;
+            buildVersion.Build = parseInt(process.env['APPVEYOR_BUILD_NUMBER']) || 0;
         }
 
         return buildVersion;
