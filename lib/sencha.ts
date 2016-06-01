@@ -374,15 +374,17 @@ namespace Sencha {
 
         build(callback?: (err: Error) => void) {
             var execute = new Promise((resolve, reject) => {
-                this.emit('stdout', 'Building "\u001b[36m' + this.name + '\u001b[39m"\n');
-                this.emit('stdout', 'Patching from version ' + this.version + ' to ' + appveyor.getBuildVersion(this.version).toString() + '\n');
 
-                patchVersion(this.location, appveyor.getBuildVersion(this.version).toString(), null, null, () => {
+                var newversion = appveyor.getBuildVersion(this.type == ModuleType.Package ? this.version : null).toString();
+
+                this.emit('stdout', 'Building "\u001b[36m' + this.name + '\u001b[39m"\n');
+                this.emit('stdout', 'Patching from version ' + this.version + ' to ' + newversion + '\n');
+
+                patchVersion(this.location, newversion, null, null, () => {
                     this.emit('stdout', 'Patched\n');
 
                     var err,
                         cmd = proc.spawn(Sencha.cmd || 'sencha.exe', [/*'config', '-prop', 'workspace.build.dir="${workspace.dir}\\build"', 'then',*/ (this.type == ModuleType.Package ? 'package' : 'app'), 'build'], { cwd: path.dirname(this.location), env: process.env });
-
 
                     cmd.stdout.on('data', (data) => {
                         this.output(data);
