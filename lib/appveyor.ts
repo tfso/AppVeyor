@@ -75,8 +75,12 @@ namespace Appveyor {
             return (this._revision != null);
         }
 
+        hasBuild() {
+            return (this._build != null);
+        }
+
         toString() {
-            return this.Major + "." + this.Minor + (this.hasRevision() == true ? "." + this.Revision : "") + "." + this.Build;
+            return this.Major + "." + this.Minor + (this.hasRevision() == true ? "." + this.Revision : "") + (this.hasBuild() == true ? "." + this.Build : "");
         }
     }
 
