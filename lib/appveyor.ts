@@ -19,6 +19,7 @@ namespace Appveyor {
 
         length: number;
         hasRevision: () => boolean;
+        hasBuild: () => boolean;
         toString: () => string; 
     }
 

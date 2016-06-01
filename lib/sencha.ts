@@ -29,6 +29,11 @@ namespace Sencha {
         sdk?: string
     }
 
+    export interface IBuildConfiguration {
+        keepPackageVersion?: boolean;
+        keepAppVersion?: boolean;
+    }
+
     export interface IWorkspace extends NodeJS.EventEmitter {
         workspace: string
         sdk: string
@@ -36,7 +41,7 @@ namespace Sencha {
         getModules(callback?: (err: Error, modules?: Array<Sencha.IModule>) => void): Promise<Array<Sencha.IModule>>
 
         upgrade(callback?: (err: Error) => void): Promise<any>
-        build(callback?: (err: Error) => void): Promise<any>
+        build(options?: IBuildConfiguration, callback?: (err: Error) => void): Promise<any>
         publish(url?: string, callback?: (err: Error) => void): Promise<any>
     }
 
@@ -47,7 +52,7 @@ namespace Sencha {
         type: ModuleType
 
         open(callback?: (err: Error) => void): Promise<any>
-        build(callback?: (err: Error) => void): Promise<any>
+        build(options?: IBuildConfiguration, callback?: (err: Error) => void): Promise<any>
     }
 
     export class Workspace extends events.EventEmitter implements IWorkspace {
@@ -186,12 +191,9 @@ namespace Sencha {
             }
         }
 
-        build(callback?: (err: Error) => void) {
+        build(options?: IBuildConfiguration, callback?: (err: Error) => void) {
 
             var execute = new Promise((resolve, reject) => {
-
-                //console.log('fetching modules');
-
                 this
                     .getModules()
                     .then((modules) => {
@@ -213,7 +215,7 @@ namespace Sencha {
                             modules, 1,
                             (module, cb) => {
                                 this.emit('stdout', '\n');
-                                module.build((ex) => {
+                                module.build(options, (ex) => {
                                     if (ex) {
                                         err = ex; cb("", true);
                                     } else {
@@ -372,17 +374,15 @@ namespace Sencha {
                 })
         }
 
-        build(callback?: (err: Error) => void) {
+        build(options?: IBuildConfiguration, callback?: (err: Error) => void) {
             var execute = new Promise((resolve, reject) => {
 
-                var newversion = appveyor.getBuildVersion(this.type == ModuleType.Package ? this.version : null).toString();
+                var newversion = appveyor.getBuildVersion((this.type == ModuleType.Package && options && options.keepPackageVersion) || (this.type == ModuleType.Application && options && options.keepAppVersion) ? this.version : null).toString();
 
                 this.emit('stdout', 'Building "\u001b[36m' + this.name + '\u001b[39m"\n');
                 this.emit('stdout', 'Patching from version ' + this.version + ' to ' + newversion + '\n');
 
                 patchVersion(this.location, newversion, null, null, () => {
-                    this.emit('stdout', 'Patched\n');
-
                     var err,
                         cmd = proc.spawn(Sencha.cmd || 'sencha.exe', [/*'config', '-prop', 'workspace.build.dir="${workspace.dir}\\build"', 'then',*/ (this.type == ModuleType.Package ? 'package' : 'app'), 'build'], { cwd: path.dirname(this.location), env: process.env });
 

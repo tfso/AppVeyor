@@ -56,19 +56,19 @@ build_script:
 
   Commands:
 
-    install [options]
+    install [options]        The output to STDOUT is the path to sencha cmd, its executable
     repository <name> <url>  Add a remote repository that should be used
+    publish [options] [url]  Publishing artifacts of apps and packages to appveyor, but if url is defined will packages be posted to repository instead
     build [options]          Build all packages and apps in a workspace
     *
 
-  AppVeyor command-line tool for building Sencha (ExtJS) projects. Either provide path to sencha 
-  command with option, env:SENCHACMD
+  AppVeyor command-line tool for building Sencha (ExtJS) projects. Either provide path to sencha command with option, env:SENCHACMD
 
   Options:
 
     -h, --help               output usage information
     -V, --version            output the version number
-    -c, --sencha-cmd <path>  Path to sencha command, either given by install or environment SENCHACMD
+    -c, --sencha-cmd <path>  Path to sencha command, either given by install or environment SENCHACMD, default: sencha.exe
 ```
 
 ### build-sencha install --help
@@ -103,14 +103,16 @@ build_script:
     -h, --help                output usage information
     -p, --path <workspace>    Path to workspace
     -d, --destination <path>  Destination of build directory
+    -z, --keepPackageVersion  Flag to keep package version instead of replacing it with appveyor version
+    -x, --keepAppVersion      Flag to keep app version instead of replacing it with appveyor version
     -j, --jsb <file>          Old style using the jsb that contains all of your project files
 ```
 
 ### build-sencha publish --help
 ```
-  Usage: publish [options]
+  Usage: publish [options] [url]
 
-  Publish packages to repository and making artifacts of apps
+  Publishing artifacts of apps and packages to appveyor, but if url is defined will packages be posted to repository instead
 
   Options:
 

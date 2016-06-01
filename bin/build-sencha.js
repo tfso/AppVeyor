@@ -58,6 +58,8 @@ program
     .description('Build all packages and apps in a workspace')
     .option('-p, --path <workspace>', 'Path to workspace', path.normalize, process.cwd())
     .option('-d, --destination <path>', 'Destination of build directory', path.normalize, path.normalize(process.cwd() + '/build'))
+    .option('-z, --keepPackageVersion', 'Flag to keep package version instead of replacing it with appveyor version')
+    .option('-x, --keepAppVersion', 'Flag to keep app version instead of replacing it with appveyor version')
     .option('-j, --jsb <file>', 'Old style using the jsb that contains all of your project files')
     .action(function (options) {
     sencha_1.default.cmd = options.parent.senchaCmd;
@@ -95,7 +97,7 @@ program
         process.stdout.write('\n');
         workspace.upgrade()
             .then(function () {
-            workspace.build()
+            workspace.build({ keepPackageVersion: options.keepPackageVersion || false, keepAppVersion: options.keepPackageVersion || false })
                 .then(function () {
                 process.stdout.write('\u001b[36mDone building\u001b[39m\n');
                 process.exit(0);
