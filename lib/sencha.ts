@@ -416,7 +416,7 @@ namespace Sencha {
                 
             });
 
-            if (arguments.length > 0 && typeof arguments[0] == 'function') {
+            if (callback != null) {
                 // callback
                 execute.then(() => { callback(null); }).catch((err) => { callback(err); });
             }
