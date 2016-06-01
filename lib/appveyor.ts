@@ -11,35 +11,72 @@ namespace Appveyor {
         Zip
     }
 
-    export interface IBuildNumber {
+    export interface IBuildVersion {
         Major: number;
         Minor: number;
         Revision?: number;
         Build: number;
 
+        length: number;
+        hasRevision: () => boolean;
         toString: () => string; 
     }
 
-    export class BuildNumber implements IBuildNumber {
-        Major = 0;
-        Minor = 0;
-        Revision = 0;
-        Build = 0;
+    export class BuildVersion implements IBuildVersion {
+        private _major = 0;
+        private _minor = 0;
+        private _revision = null;
+        private _build = null;
 
         constructor(version: string) {
             var match: Array<any>;
-            
+
             match = /(\d+)\.(\d+)(?:\.(\d+))?\.(\d+)/ig.exec(version);
             if (match) {
-                if (isNaN(match[1]) == false) this.Major = parseInt(match[1]);
-                if (isNaN(match[2]) == false) this.Minor = parseInt(match[2]);
-                if (isNaN(match[3]) == false) this.Revision = parseInt(match[3]);
-                if (isNaN(match[4]) == false) this.Build = parseInt(match[4]);
+                if (isNaN(match[1]) == false) this._major = parseInt(match[1]);
+                if (isNaN(match[2]) == false) this._minor = parseInt(match[2]);
+                if (isNaN(match[3]) == false) this._revision = parseInt(match[3]);
+                if (isNaN(match[4]) == false) this._build = parseInt(match[4]);
             }
         }
 
+        public get Major() {
+            return this._major;
+        }
+        
+        public get Minor() {
+            return this._minor;
+        }
+
+        public get Revision() {
+            return this._revision || 0;
+        }
+
+        public set Revision(value) {
+            this._revision = value;
+        }
+
+        public get Build() {
+            return this._build || 0;
+        }
+
+        public set Build(value) {
+            this._build = value;
+        }
+
+        public get length() {
+            if (this._revision == null) return 2;
+            if (this._build == null) return 3;
+
+            return 4;
+        }
+
+        hasRevision() {
+            return (this._revision != null);
+        }
+
         toString() {
-            return this.Major + "." + this.Minor + "." + this.Build;
+            return this.Major + "." + this.Minor + (this.hasRevision() == true ? "." + this.Revision : "") + "." + this.Build;
         }
     }
 
@@ -230,21 +267,29 @@ namespace Appveyor {
         }
     }
 
-    export function getBuildVersion(): Appveyor.IBuildNumber {
-        var variables = [
-            'APPVEYOR_BUILD_VERSION',
-            'APPVEYOR_REPO_TAG_NAME'
-        ];
+    export function getBuildVersion(rawversion?: string): Appveyor.IBuildVersion {
+        var buildVersion,
+            variables = [
+                'APPVEYOR_BUILD_VERSION',
+                'APPVEYOR_REPO_TAG_NAME'
+            ];
 
-        var versionRaw = variables
-            .map((variable): string => {
-                return process.env[variable] || "0.0.1";
-            })
-            .filter((variable: string) => {
-                return variable !== undefined && variable.length > 0;
-            })[0] || '0.0.1';
+        if (rawversion == null) {
+            buildVersion = new Appveyor.BuildVersion(
+                variables
+                    .map((variable): string => {
+                        return process.env[variable] || "0.0.1";
+                    })
+                    .filter((variable: string) => {
+                        return variable !== undefined && variable.length > 0;
+                    })[0] || '0.0.1'
+            );
+        } else {
+            buildVersion = new Appveyor.BuildVersion(rawversion);
+            buildVersion.Build = parseInt(process.env['APPVEYOR_BUILD_NUMBER']) || 1;
+        }
 
-        return new Appveyor.BuildNumber(versionRaw);
+        return buildVersion;
     }
 }
 

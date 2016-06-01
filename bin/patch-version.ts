@@ -1,7 +1,8 @@
 ﻿#!/usr/bin/env node
 
 import appveyor from './../lib/appveyor';
-import patchVersion = require('./../lib/patch-version');
+import patchVersion from './../lib/patch-version';
+
 import path = require('path');
 import program = require('commander');
 
@@ -20,5 +21,6 @@ program.parse(process.argv);
 
 var source = path.parse( file || "package.json" );
 file = !source.dir ? path.normalize(process.cwd() + '/' + source.base) : file;
-   
+
+
 patchVersion(file, program.buildVersion, console.log, console.error, process.exit);

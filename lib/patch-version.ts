@@ -1,7 +1,7 @@
 ﻿import path = require('path');
 import fsp = require('../lib/fs-promise');
 
-function patchVersion(file: string, version: string, log?: Function, error?: Function, exit?: Function): Promise<any> {
+export default function patchVersion(file: string, version: string, log?: Function, error?: Function, exit?: Function): Promise<any> {
     var packagePath = path.normalize(file);
 
     return fsp
@@ -33,5 +33,3 @@ function patchVersion(file: string, version: string, log?: Function, error?: Fun
                 exit(-1);
         });
 };
-
-export = patchVersion;

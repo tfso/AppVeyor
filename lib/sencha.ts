@@ -12,6 +12,7 @@ import unzip = require('unzip');
 import request = require('request-json');
 
 import appveyor from './appveyor';
+import patchVersion from './patch-version';
 
 namespace Sencha {
     
@@ -36,7 +37,7 @@ namespace Sencha {
 
         upgrade(callback?: (err: Error) => void): Promise<any>
         build(callback?: (err: Error) => void): Promise<any>
-        publish(callback?: (err: Error) => void): Promise<any>
+        publish(url?: string, callback?: (err: Error) => void): Promise<any>
     }
 
     export interface IModule extends NodeJS.EventEmitter {
@@ -53,7 +54,6 @@ namespace Sencha {
         workspace = ""
         sdk = ""
         buildPath = ""
-        senchaCmd = ""
 
         _lastOutputWithLF = false
 
@@ -375,34 +375,43 @@ namespace Sencha {
         build(callback?: (err: Error) => void) {
             var execute = new Promise((resolve, reject) => {
                 this.emit('stdout', 'Building "\u001b[36m' + this.name + '\u001b[39m"\n');
+                this.emit('stdout', 'Patching from version ' + this.version + ' to ' + appveyor.getBuildVersion(this.version).toString() + '\n');
 
-                var err,
-                    cmd = proc.spawn(Sencha.cmd || 'sencha.exe', [/*'config', '-prop', 'workspace.build.dir="${workspace.dir}\\build"', 'then',*/ (this.type == ModuleType.Package ? 'package' : 'app'), 'build'], { cwd: path.dirname(this.location), env: process.env });
+                patchVersion(this.location, appveyor.getBuildVersion(this.version).toString(), null, null, () => {
+                    this.emit('stdout', 'Patched\n');
 
-                cmd.stdout.on('data', (data) => {
-                    this.output(data);
+                    var err,
+                        cmd = proc.spawn(Sencha.cmd || 'sencha.exe', [/*'config', '-prop', 'workspace.build.dir="${workspace.dir}\\build"', 'then',*/ (this.type == ModuleType.Package ? 'package' : 'app'), 'build'], { cwd: path.dirname(this.location), env: process.env });
+
+
+                    cmd.stdout.on('data', (data) => {
+                        this.output(data);
+                    })
+
+                    cmd.stderr.on('data', (data) => {
+                        this.output(data);
+                    })
+
+                    cmd.on('error', (ex) => {
+                        err = ex;
+                    })
+
+                    cmd.on('close', (code) => {
+                        if (code != 0) {
+                            this.emit('close', code, err); reject(new Error("Build failed (" + code + ")"));
+                        }
+                        else {
+                            this.emit('close', 0, null);
+
+                            // validate build (see if the output is correct
+
+                            resolve();
+                        }
+                    })
+
                 })
 
-                cmd.stderr.on('data', (data) => {
-                    this.output(data);
-                })
-
-                cmd.on('error', (ex) => {
-                    err = ex;
-                })
-
-                cmd.on('close', (code) => {
-                    if (code != 0) {
-                        this.emit('close', code, err); reject(new Error("Build failed (" + code + ")"));
-                    }
-                    else {
-                        this.emit('close', 0, null);
-
-                        // validate build (see if the output is correct
-
-                        resolve();
-                    }
-                })
+                
             });
 
             if (arguments.length > 0 && typeof arguments[0] == 'function') {

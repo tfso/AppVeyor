@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 "use strict";
 var appveyor_1 = require('./../lib/appveyor');
-var patchVersion = require('./../lib/patch-version');
+var patch_version_1 = require('./../lib/patch-version');
 var path = require('path');
 var program = require('commander');
 var file;
@@ -16,5 +16,5 @@ program
 program.parse(process.argv);
 var source = path.parse(file || "package.json");
 file = !source.dir ? path.normalize(process.cwd() + '/' + source.base) : file;
-patchVersion(file, program.buildVersion, console.log, console.error, process.exit);
+patch_version_1.default(file, program.buildVersion, console.log, console.error, process.exit);
 //# sourceMappingURL=patch-version.js.map
