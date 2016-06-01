@@ -380,7 +380,7 @@ namespace Sencha {
                 var newversion = appveyor.getBuildVersion((this.type == ModuleType.Package && options && options.keepPackageVersion) || (this.type == ModuleType.Application && options && options.keepAppVersion) ? this.version : null).toString();
 
                 this.emit('stdout', 'Building "\u001b[36m' + this.name + '\u001b[39m"\n');
-                this.emit('stdout', 'Patching from version ' + this.version + ' to ' + newversion + '\n');
+                this.emit('stdout', 'Patching from version ' + this.version + ' to ' + newversion + ' based at ' + ((this.type == ModuleType.Package && options && options.keepPackageVersion) || (this.type == ModuleType.Application && options && options.keepAppVersion) ? this.version : 'N/A') + '\n');
 
                 patchVersion(this.location, newversion, null, null, () => {
                     var err,

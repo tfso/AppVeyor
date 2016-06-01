@@ -97,7 +97,7 @@ program
         process.stdout.write('\n');
         workspace.upgrade()
             .then(function () {
-            workspace.build({ keepPackageVersion: options.keepPackageVersion || false, keepAppVersion: options.keepPackageVersion || false })
+            workspace.build({ keepPackageVersion: (options.keepPackageVersion !== undefined ? options.keepPackageVersion === true : false), keepAppVersion: (options.keepAppVersion !== undefined ? options.keepAppVersion === true : false) })
                 .then(function () {
                 process.stdout.write('\u001b[36mDone building\u001b[39m\n');
                 process.exit(0);
