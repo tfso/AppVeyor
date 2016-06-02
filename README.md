@@ -14,8 +14,8 @@ AppVeyor configuration file 'appveyor.yml' can be configured to build Sencha pro
 ```yaml
 environment:
   nodejs_version: "4"
-  SENCHACMD_URL: http://cdn.sencha.com/cmd/6.1.2/jre/SenchaCmd-6.1.2-windows-32bit.zip
-  SENCHACMD_REPOSITORY: https://sencharepo.example.org/packages/
+  SENCHACMD_URL: http://cdn.sencha.com/cmd/6.1.2/jre/SenchaCmd-6.1.2-windows-64bit.zip
+  SENCHACMD_REPOSITORY: https://sencharepository.api.24sevenoffice.com/packages/
 branches:
     only:
       - master
@@ -25,13 +25,16 @@ skip_tags: true
 install:
   - ps: Install-Product node $env:nodejs_version
   - node --version
-  - npm install -g tfso/AppVeyor#1.0.58
 
 build_script:
+  - echo %APPVEYOR_REPO_COMMIT_MESSAGE%
+  - echo %APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED%
+  - npm install -g tfso/AppVeyor#1.0.95
+  
   - build-sencha install --url %SENCHACMD_URL% --destination c:\tools\sencha-cmd\
   - build-sencha repository tfso %SENCHACMD_REPOSITORY% --sencha-cmd c:\tools\sencha-cmd\sencha.exe
-  - build-sencha build --path %APPVEYOR_BUILD_FOLDER% --sencha-cmd c:\tools\sencha-cmd\sencha.exe
-  - build-sencha publish
+  - build-sencha build --path %APPVEYOR_BUILD_FOLDER% --keepPackageVersion --sencha-cmd c:\tools\sencha-cmd\sencha.exe
+  - build-sencha publish %SENCHACMD_REPOSITORY%
 ```
 
 ## Usage
