@@ -384,7 +384,7 @@ namespace Sencha {
 
                 patchVersion(this.location, newversion, null, null, () => {
                     var err,
-                        cmd = proc.spawn(Sencha.cmd || 'sencha.exe', [/*'config', '-prop', 'workspace.build.dir="${workspace.dir}\\build"', 'then',*/ (this.type == ModuleType.Package ? 'package' : 'app'), 'build', (this.type == ModuleType.Application ? 'production' : '')], { cwd: path.dirname(this.location), env: process.env });
+                        cmd = proc.spawn(Sencha.cmd || 'sencha.exe', ['config', '-prop', 'skip.slice=1', /*'-prop', 'skip.sass=1',*/ 'then', (this.type == ModuleType.Package ? 'package' : 'app'), 'build', (this.type == ModuleType.Application ? 'production' : '')], { cwd: path.dirname(this.location), env: process.env });
 
                     cmd.stdout.on('data', (data) => {
                         this.output(data);
