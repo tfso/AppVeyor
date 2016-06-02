@@ -15,7 +15,7 @@ AppVeyor configuration file 'appveyor.yml' can be configured to build Sencha pro
 environment:
   nodejs_version: "4"
   SENCHACMD_URL: http://cdn.sencha.com/cmd/6.1.2/jre/SenchaCmd-6.1.2-windows-64bit.zip
-  SENCHACMD_REPOSITORY: https://sencharepository.api.24sevenoffice.com/packages/
+  SENCHACMD_REPOSITORY: https://sencharepository.example.com/packages/
 branches:
     only:
       - master
