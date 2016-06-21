@@ -257,6 +257,9 @@ namespace Sencha {
                         fsp
                             .listFiles(path.join(this.workspace, 'packages/local'), 1)
                             .then((files) => {
+                                if (files == null || files == undefined)
+                                    return [];
+
                                 return files
                                     .filter((file) => {
                                         return path.parse(file).base == 'package.json';
@@ -268,6 +271,9 @@ namespace Sencha {
                         fsp
                             .listFiles(this.workspace, 1)
                             .then((files) => {
+                                if (files == null || files == undefined)
+                                    return [];
+
                                 return files
                                     .filter((file) => {
                                         return path.parse(file).base == 'app.json';
