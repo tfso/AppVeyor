@@ -30,9 +30,12 @@ export function listDirectories(location: string): Promise<Array<string>> {
                 if (error)
                     return reject(error)
 
-                resolve(files.filter(function (file) {
-                    return fs.statSync(path.join(location, file)).isDirectory();
-                }))
+                if (files != null)
+                    resolve(files.filter(function (file) {
+                        return fs.statSync(path.join(location, file)).isDirectory();
+                    }))
+                else
+                    resolve([]);
             }
         )
     })
@@ -47,25 +50,27 @@ export function listFiles(location: string, depth?: number): Promise<Array<strin
                         currentDepth = 0;
 
                     // get files
-                    result = result.concat(
-                        files.filter(function (file) {
-                            return fs.statSync(path.join(location, file)).isFile()
-                        }).map(function (file) {
-                            return path.join(location, file);
-                        })
-                    );
+                    if(files != null)
+                        result = result.concat(
+                            files.filter(function (file) {
+                                return fs.statSync(path.join(location, file)).isFile()
+                            }).map(function (file) {
+                                return path.join(location, file);
+                            })
+                        );
 
                     // get recursive files
                     if (currentDepth++ < depth) {
                         var promises = [];
 
-                        files.filter(function (file) {
-                            return fs.statSync(path.join(location, file)).isDirectory()
-                        }).forEach(function (dir) {
-                            promises.push(
-                                listFiles(path.join(location, dir), depth - currentDepth)
-                            )
-                        })
+                        if(files != null)
+                            files.filter(function (file) {
+                                return fs.statSync(path.join(location, file)).isDirectory()
+                            }).forEach(function (dir) {
+                                promises.push(
+                                    listFiles(path.join(location, dir), depth - currentDepth)
+                                )
+                            })
 
                         Promise
                             .all(promises)
