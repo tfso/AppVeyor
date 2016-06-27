@@ -7,6 +7,6 @@ describe('When running tests', () => {
     });
 
     it('should succeed with expect', () => {
-        expect(true).toBe(true, "This shouldn't fail");
+        //expect(true).toBe(true, "This shouldn't fail");
     });
 });

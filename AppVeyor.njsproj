@@ -20,9 +20,10 @@
     <OutputPath>.</OutputPath>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
-    <ProjectView>ProjectFiles</ProjectView>
+    <ProjectView>ShowAllFiles</ProjectView>
     <TypeScriptSourceMap>true</TypeScriptSourceMap>
     <TypeScriptModuleKind>CommonJS</TypeScriptModuleKind>
+    <TypeScriptCompileOnSaveEnabled>True</TypeScriptCompileOnSaveEnabled>
     <EnableTypeScript>true</EnableTypeScript>
     <StartWebBrowser>false</StartWebBrowser>
   </PropertyGroup>
@@ -33,6 +34,7 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="tsconfig.json" />
     <TypeScriptCompile Include="app.ts" />
     <Content Include="appveyor.yml" />
     <Content Include="package.json" />
@@ -47,8 +49,6 @@
       <SubType>Code</SubType>
       <TestFramework>Mocha</TestFramework>
     </TypeScriptCompile>
-    <TypeScriptCompile Include="typings\async\async.d.ts" />
-    <TypeScriptCompile Include="typings\es6-promise\es6-promise.d.ts" />
     <TypeScriptCompile Include="typings\es6-promise\es6-promise.d.ts" />
     <TypeScriptCompile Include="typings\es6-promise\es6-promise.d.ts" />
     <TypeScriptCompile Include="typings\es6-promise\es6-promise.d.ts" />
@@ -57,13 +57,10 @@
     <TypeScriptCompile Include="typings\expect\expect.d.ts" />
     <TypeScriptCompile Include="typings\expect\expect.d.ts" />
     <TypeScriptCompile Include="typings\expect\expect.d.ts" />
-    <TypeScriptCompile Include="typings\expect\expect.d.ts" />
     <TypeScriptCompile Include="typings\mocha\mocha.d.ts" />
     <TypeScriptCompile Include="typings\mocha\mocha.d.ts" />
     <TypeScriptCompile Include="typings\mocha\mocha.d.ts" />
     <TypeScriptCompile Include="typings\mocha\mocha.d.ts" />
-    <TypeScriptCompile Include="typings\mocha\mocha.d.ts" />
-    <TypeScriptCompile Include="typings\node\node.d.ts" />
     <TypeScriptCompile Include="typings\node\node.d.ts" />
     <TypeScriptCompile Include="typings\node\node.d.ts" />
     <TypeScriptCompile Include="typings\node\node.d.ts" />
@@ -74,7 +71,6 @@
     <Folder Include="bin\" />
     <Folder Include="tests\" />
     <Folder Include="typings\" />
-    <Folder Include="typings\async\" />
     <Folder Include="typings\es6-promise\" />
     <Folder Include="typings\expect\" />
     <Folder Include="typings\mocha\" />

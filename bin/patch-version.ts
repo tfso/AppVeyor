@@ -23,4 +23,4 @@ var source = path.parse( file || "package.json" );
 file = !source.dir ? path.normalize(process.cwd() + '/' + source.base) : file;
 
 
-patchVersion(file, program.buildVersion, console.log, console.error, process.exit);
+patchVersion(file, (<any>program).buildVersion, console.log, console.error, process.exit);

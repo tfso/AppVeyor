@@ -15,7 +15,6 @@ import appveyor from './appveyor';
 import patchVersion from './patch-version';
 
 namespace Sencha {
-    
     export var cmd: string
 
     export enum ModuleType {
@@ -129,7 +128,7 @@ namespace Sencha {
                                         break;
                                 }
                             },
-                            (message, result) => {
+                            (result) => {
                                 if (err) {
                                     this.emit('close', -1, err); reject(err);
                                 }
@@ -223,7 +222,7 @@ namespace Sencha {
                                     }
                                 })
                             },
-                            (message, result) => {
+                            (result) => {
                                 if (err) {
                                     this.emit('close', -1, err); reject(err);
                                 }

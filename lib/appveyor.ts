@@ -88,7 +88,7 @@ namespace Appveyor {
     export class BuildWorker {
         private static _instance: BuildWorker
 
-        private _request:Object = null
+        private _request: request.JsonClient = null
 
         constructor(api?: string) {
             if (BuildWorker._instance) {
