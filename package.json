@@ -5,7 +5,8 @@
   "main": "app.js",
   "bin": {
     "patch-version": "bin/patch-version.js",
-    "build-sencha": "bin/build-sencha.js"
+    "build-sencha": "bin/build-sencha.js",
+    "artifact": "bin/artifact.js"
   },
   "author": {
     "name": "24SevenOffice"
