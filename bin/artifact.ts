@@ -19,7 +19,8 @@ program
     .action((options) => {
         appveyor.BuildWorker.addArtifact(options.name, options.path, options.name + ".zip", appveyor.ArtifactType.Zip, (err) => {
             if (err){
-                process.stderr.write(err); process.exit(1);
+                process.stderr.write('\u001b[31m'+err.toString()+'\u001b[39m\n');
+                process.exit(1);
             // } else {
             //     process.exit(0);
             }
