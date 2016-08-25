@@ -48,6 +48,8 @@ namespace Sencha {
         location: string
         name: string
         version: string
+        publish: boolean
+
         type: ModuleType
 
         open(callback?: (err: Error) => void): Promise<any>
@@ -103,7 +105,12 @@ namespace Sencha {
                                         break;
 
                                     case ModuleType.Package:
-                                        if (url) {                                            
+                                        if (url) { 
+                                            if (module.publish == false) {
+                                                process.stdout.write('\u001b[36mUploading of artifact \u001b[39m' + module.name + ' \u001b[36mis ignored since publish property is set to false in package.json\u001b[39m...');
+                                                break;
+                                            }
+
                                             process.stdout.write('\u001b[36mUploading artifact \u001b[39m' + module.name + ' \u001b[36mto remote repository\u001b[39m...');
                                             var req = request.createClient(url);
 
@@ -320,6 +327,7 @@ namespace Sencha {
         name = ""
         location = null
         version = null
+        publish = true
 
         constructor(config: IConfiguration) {
             super();
@@ -352,6 +360,7 @@ namespace Sencha {
 
                         this.name = json.name;
                         this.version = json.version;
+                        this.publish = typeof json.publsih == 'boolean' ? json.publish : true;
                     })
                     .then(() => {
                         resolve();
