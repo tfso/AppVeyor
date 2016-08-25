@@ -58,7 +58,7 @@ program
 
         workspace.publish(url)
             .then(() => { process.exit(0) })
-            .catch(() => { process.exit(1) });
+            .catch((err) => { process.exit(1) });
     })
 
 program

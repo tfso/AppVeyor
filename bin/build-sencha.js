@@ -51,7 +51,7 @@ program
     });
     workspace.publish(url)
         .then(function () { process.exit(0); })
-        .catch(function () { process.exit(1); });
+        .catch(function (err) { process.exit(1); });
 });
 program
     .command('build')

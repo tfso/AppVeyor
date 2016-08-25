@@ -108,6 +108,8 @@ namespace Sencha {
                                         if (url) { 
                                             if (module.publish == false) {
                                                 process.stdout.write('\u001b[36mUploading of artifact \u001b[39m' + module.name + ' \u001b[36mis ignored since publish property is set to false in package.json\u001b[39m...');
+
+                                                cb("", true);
                                                 break;
                                             }
 
