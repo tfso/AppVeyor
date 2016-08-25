@@ -360,7 +360,7 @@ namespace Sencha {
 
                         this.name = json.name;
                         this.version = json.version;
-                        this.publish = typeof json.publsih == 'boolean' ? json.publish : true;
+                        this.publish = typeof json.publish == 'boolean' ? json.publish : true;
                     })
                     .then(() => {
                         resolve();
