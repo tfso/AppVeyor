@@ -1,6 +1,6 @@
 {
   "name": "appveyor",
-  "version": "0.0.1",
+  "version": "1.0.112",
   "description": "Tools for AppVeyor",
   "main": "app.js",
   "bin": {
