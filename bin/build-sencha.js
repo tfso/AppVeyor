@@ -61,6 +61,7 @@ program
     .option('-z, --keepPackageVersion', 'Flag to keep package version instead of replacing it with appveyor version')
     .option('-x, --keepAppVersion', 'Flag to keep app version instead of replacing it with appveyor version')
     .option('-j, --jsb <file>', 'Old style using the jsb that contains all of your project files')
+    .option('-s, --sdk <path>', 'Path or Package name to Sencha framework')
     .action(function (options) {
     sencha_1.default.cmd = options.parent.senchaCmd;
     if (options.jsb && options.jsb.length > 0) {
@@ -83,7 +84,8 @@ program
     else {
         var workspace = new sencha_1.default.Workspace({
             path: options.path,
-            buildPath: options.destination
+            buildPath: options.destination,
+            sdk: options.sdk
         });
         workspace.on('stdout', function (data) {
             process.stdout.write(data);
