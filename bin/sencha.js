@@ -1,43 +1,44 @@
+#!/usr/bin/env node
 "use strict";
 var proc = require('child_process');
 var path = require('path');
 var program = require('commander');
 program
     .version(process.env.npm_package_version || require('./../package.json').version)
+    .description("Sencha wrapper")
     .option('-c, --sencha-cmd <path>', 'Path to sencha command, either given by install or environment SENCHACMD, default: ' + (process.env.SENCHACMD || "sencha.exe"), path.normalize, process.env.SENCHACMD || "sencha.exe")
-    .command('*')
-    .action(function (options) {
-    process.env['SENCHACMD'] = (options.senchaCmd || 'sencha.exe');
-    new Promise(function (resolve, reject) {
-        var err, cmd = proc.spawn(process.env.SENCHACMD, process.argv.slice(2, process.argv.length), { cwd: process.cwd(), env: process.env });
-        cmd.stdout.on('data', function (data) {
-            output(data); // this.emit('stdout', data.toString().replace(/\n/gi, ""));
-        });
-        cmd.stderr.on('data', function (data) {
-            output(data); //this.emit('stderr', data.toString().replace(/\n/gi, ""));
-        });
-        cmd.on('error', function (ex) {
-            err = ex;
-        });
-        cmd.on('close', function (code) {
-            if (code != 0) {
-                reject(err || new Error());
-            }
-            else {
-                resolve();
-            }
-        });
-    })
-        .then(function () {
-        process.exit(0);
-    })
-        .catch(function () {
-        process.exit(-1);
-    });
-});
-program.parse(process.argv);
+    .parse(process.argv);
 if (program.args.length == 0)
     program.help();
+var SENCHACMD = process.env.SENCHACMD || "sencha.exe";
+if (program['senchaCmd'])
+    SENCHACMD = program['senchaCmd'];
+new Promise(function (resolve, reject) {
+    var err, cmd = proc.spawn(SENCHACMD, program.args, { cwd: process.cwd(), env: process.env });
+    cmd.stdout.on('data', function (data) {
+        output(data); // this.emit('stdout', data.toString().replace(/\n/gi, ""));
+    });
+    cmd.stderr.on('data', function (data) {
+        output(data); //this.emit('stderr', data.toString().replace(/\n/gi, ""));
+    });
+    cmd.on('error', function (ex) {
+        err = ex;
+    });
+    cmd.on('close', function (code) {
+        if (code != 0) {
+            reject(err || new Error());
+        }
+        else {
+            resolve();
+        }
+    });
+})
+    .then(function () {
+    process.exit(0);
+})
+    .catch(function () {
+    process.exit(-1);
+});
 var lastOutputWithLF = false;
 function output(std) {
     getSenchaOutput(std)
