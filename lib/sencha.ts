@@ -29,6 +29,7 @@ namespace Sencha {
     }
 
     export interface IBuildConfiguration {
+        buildOnly?: ModuleType;
         keepPackageVersion?: boolean;
         keepAppVersion?: boolean;
     }
@@ -259,14 +260,23 @@ namespace Sencha {
                         async.everyLimit<IModule>(
                             modules, 1,
                             (module, cb) => {
-                                this.emit('stdout', '\n');
-                                module.build(options, (ex) => {
-                                    if (ex) {
-                                        err = ex; cb("", true);
-                                    } else {
-                                        cb("", true);
-                                    }
-                                })
+
+                                if (options.buildOnly == null || module.type == options.buildOnly) {
+                                    this.emit('stdout', '\n');
+                                    module.build(options, (ex) => {
+                                        if (ex) {
+                                            err = ex; cb("", true);
+                                        } else {
+                                            cb("", true);
+                                        }
+                                    })
+                                }
+                                else {
+                                    this.emit('stdout', '\n');
+                                    this.emit('Ignoring ' + module.name);
+
+                                    cb("", true);
+                                }
                             },
                             (result) => {
                                 if (err) {

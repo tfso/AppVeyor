@@ -58,6 +58,7 @@ program
     .description('Build all packages and apps in a workspace')
     .option('-p, --path <workspace>', 'Path to workspace', path.normalize, process.cwd())
     .option('-d, --destination <path>', 'Destination of build directory', path.normalize, path.normalize(process.cwd() + '/build'))
+    .option('-b, --buildOnly <type>', 'Build either package or app', /^(app|package)$/i, 'all')
     .option('-z, --keepPackageVersion', 'Flag to keep package version instead of replacing it with appveyor version')
     .option('-x, --keepAppVersion', 'Flag to keep app version instead of replacing it with appveyor version')
     .option('-j, --jsb <file>', 'Old style using the jsb that contains all of your project files')
@@ -97,9 +98,14 @@ program
         process.stdout.write('Workspace: ' + workspace.workspace + '\n');
         process.stdout.write('Cmd: ' + sencha_1.default.cmd + '\n');
         process.stdout.write('\n');
+        var buildType = null;
+        if (options.buildOnly == 'app')
+            buildType = sencha_1.default.ModuleType.Application;
+        if (options.buildOnly == 'package')
+            buildType = sencha_1.default.ModuleType.Package;
         workspace.upgrade()
             .then(function () {
-            workspace.build({ keepPackageVersion: (options.keepPackageVersion !== undefined ? options.keepPackageVersion === true : false), keepAppVersion: (options.keepAppVersion !== undefined ? options.keepAppVersion === true : false) })
+            workspace.build({ buildOnly: buildType, keepPackageVersion: (options.keepPackageVersion !== undefined ? options.keepPackageVersion === true : false), keepAppVersion: (options.keepAppVersion !== undefined ? options.keepAppVersion === true : false) })
                 .then(function () {
                 process.stdout.write('\u001b[36mDone building\u001b[39m\n');
                 process.exit(0);
