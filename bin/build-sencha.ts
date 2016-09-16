@@ -116,7 +116,7 @@ program
             process.stdout.write('Cmd: ' + sencha.cmd + '\n');
             process.stdout.write('\n');
 
-            workspace.upgrade()
+            workspace.install()
                 .then(() => {
                     workspace.build({ keepPackageVersion: (options.keepPackageVersion !== undefined ? options.keepPackageVersion === true : false), keepAppVersion: (options.keepAppVersion !== undefined ? options.keepAppVersion === true : false) })
                         .then(() => {

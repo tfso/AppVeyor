@@ -199,6 +199,43 @@ namespace Sencha {
             }
         }
 
+        install(callback?: (err: Error) => void) {
+            var execute = new Promise((resolve, reject) => {
+                var err,
+                    cmd = proc.spawn(Sencha.cmd || 'sencha.exe', ['framework', 'add', 'ext', this.sdk || "ext"], { cwd: this.workspace, env: process.env });
+
+                cmd.stdout.on('data', (data) => {
+                    this.output(data); // this.emit('stdout', data.toString().replace(/\n/gi, ""));
+                })
+
+                cmd.stderr.on('data', (data) => {
+                    this.output(data); //this.emit('stderr', data.toString().replace(/\n/gi, ""));
+                })
+
+                cmd.on('error', (ex) => {
+                    err = ex;
+                })
+
+                cmd.on('close', (code) => {
+                    if (code != 0) {
+                        this.emit('close', code, err); reject(err || new Error('Upgrading workspace failed (' + code + ')'));
+                    }
+                    else {
+                        this.emit('close', 0, null); resolve();
+                    }
+                })
+            });
+
+            if (callback != null) {
+                // callback
+                execute.then(() => { callback(null); }).catch((err) => { callback(err); });
+            }
+            else {
+                // promise
+                return execute;
+            }
+        }
+
         build(options?: IBuildConfiguration, callback?: (err: Error) => void) {
 
             var execute = new Promise((resolve, reject) => {
