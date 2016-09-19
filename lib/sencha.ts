@@ -310,20 +310,6 @@ namespace Sencha {
                 Promise
                     .all([
                         fsp
-                            .listFiles(path.join(this.workspace, 'packages/local'), 1)
-                            .then((files) => {
-                                if (files == null || files == undefined)
-                                    return [];
-
-                                return files
-                                    .filter((file) => {
-                                        return path.parse(file).base == 'package.json';
-                                    })
-                                    .map((file) => {
-                                        return new Sencha.Module({ path: file, buildPath: this.buildPath });
-                                    });
-                            }),
-                        fsp
                             .listFiles(this.workspace, 1)
                             .then((files) => {
                                 if (files == null || files == undefined)
@@ -332,6 +318,20 @@ namespace Sencha {
                                 return files
                                     .filter((file) => {
                                         return path.parse(file).base == 'app.json';
+                                    })
+                                    .map((file) => {
+                                        return new Sencha.Module({ path: file, buildPath: this.buildPath });
+                                    });
+                            }),
+                        fsp
+                            .listFiles(path.join(this.workspace, 'packages/local'), 1)
+                            .then((files) => {
+                                if (files == null || files == undefined)
+                                    return [];
+
+                                return files
+                                    .filter((file) => {
+                                        return path.parse(file).base == 'package.json';
                                     })
                                     .map((file) => {
                                         return new Sencha.Module({ path: file, buildPath: this.buildPath });
