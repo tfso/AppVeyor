@@ -122,22 +122,16 @@ program
             if (options.buildOnly == 'app') buildType = sencha.ModuleType.Application;
             if (options.buildOnly == 'package') buildType = sencha.ModuleType.Package;
 
-            workspace.upgrade()
+            workspace.build({ buildOnly: buildType, keepPackageVersion: (options.keepPackageVersion !== undefined ? options.keepPackageVersion === true : false), keepAppVersion: (options.keepAppVersion !== undefined ? options.keepAppVersion === true : false) })
                 .then(() => {
-                    workspace.build({ buildOnly: buildType, keepPackageVersion: (options.keepPackageVersion !== undefined ? options.keepPackageVersion === true : false), keepAppVersion: (options.keepAppVersion !== undefined ? options.keepAppVersion === true : false) })
-                        .then(() => {
-                            process.stdout.write('\u001b[36mDone building\u001b[39m\n');
-                            process.exit(0);
-                        })
-                        .catch((err) => {
-                            process.stdout.write("Failed; Workspace Build\n");
-                            process.exit(1);
-                        })
+                    process.stdout.write('\u001b[36mDone building\u001b[39m\n');
+                    process.exit(0);
                 })
                 .catch((err) => {
-                    process.stdout.write("Failed; Workspace Upgrade\n");
+                    process.stdout.write("Failed; Workspace Build\n");
                     process.exit(1);
                 })
+               
         }
     })
 
