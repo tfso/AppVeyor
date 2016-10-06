@@ -178,7 +178,7 @@ namespace Appveyor {
                         return cb(err);
                     }
 
-                    process.stdout.write('\u001b[32mOK\u001b[39m\n');
+                    process.stdout.write('\u001b[32mOK\u001b[39m (' + response.statusCode + ': ' + uploadUrl + ')\n');
 
                     // we have a uploadUrl we can upload our artifact
                     switch (type) {
