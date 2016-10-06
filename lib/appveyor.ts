@@ -179,13 +179,17 @@ namespace Appveyor {
                         return cb(err);
                     }
 
-                    process.stdout.write('\u001b[32mOK\u001b[39m (' + response.statusCode + ': ' + uploadUrl + ')\n');
+                    this.addMessage('Posting of artifact ' + name + ' to API was successful');
+                    this.addMessage('Directory: ' + dir);
+                    this.addMessage('Filename: ' + filename || location.base);
+
+                    process.stdout.write('\u001b[32mOK\u001b[39m\n');
 
                     // we have a uploadUrl we can upload our artifact
                     switch (type) {
                         case ArtifactType.Zip:
                             
-                            //console.log("7z a " + path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip") + " " + dir);
+                            this.addMessage("Zipping with cmd: 7z a " + path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip") + " " + dir);
 
                             process.stdout.write('\u001b[36mZipping source\u001b[39m...');
 
