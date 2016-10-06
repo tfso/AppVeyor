@@ -2,6 +2,7 @@
 import os = require('os');
 import path = require('path');
 import proc = require('child_process');
+import fs = require('fs');
 
 namespace Appveyor {
     export enum ArtifactType {
@@ -196,6 +197,9 @@ namespace Appveyor {
                                     return cb(err);
                                 }
 
+                                var stat = fs.statSync(os.tmpdir() + '/sencha-build/' + name + ".zip");
+                                this.addMessage('Artifact size: ' + stat.size);
+
                                 process.stdout.write('\u001b[32mOK\u001b[39m\n');
 
                                 process.stdout.write('\u001b[36mUploading artifact\u001b[39m...');
@@ -211,7 +215,7 @@ namespace Appveyor {
 
                                         process.stdout.write('\u001b[32mOK\u001b[39m\n');
 
-                                        this.addMessage('Uploaded artifact ' + name + ' from ' + source);
+                                        this.addMessage('Uploaded artifact ' + name + ' from ' + dir);
 
                                         cb(null);
                                     })
