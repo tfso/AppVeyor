@@ -171,7 +171,7 @@ namespace Appveyor {
 
             BuildWorker.getInstance()
                 .request
-                .post('api/artifacts', { name: name, path: dir, fileName: filename || location.base, type: (type ? ArtifactType[type] : ArtifactType[ArtifactType.Auto]) }, (err, response, uploadUrl) => {
+                .post('api/artifacts', { name: name, path: dir, fileName: filename || location.base, type: (type ? ArtifactType[type] : ArtifactType[ArtifactType.Auto]) }, (err, response, options) => {
                     if (err || response.statusCode > 299) { // api/artifacts body isn't a valid json
                         process.stdout.write('\u001b[31mFAILED\u001b[39m\n');
                         this.addException('Posting artifact ' + name + ' to appveyor failed', err);
@@ -179,10 +179,12 @@ namespace Appveyor {
                         return cb(err);
                     }
 
-                    BuildWorker.addMessage('Posting of artifact ' + name + ' to API was successful');
-                    BuildWorker.addMessage('Directory: ' + dir);
+                    var uploadUrl = options.UploadUrl;
+
+                    BuildWorker.addMessage('[' + name + '] Posting of artifact ' + name + ' to API was successful from ' + dir);
+                    /*BuildWorker.addMessage('Directory: ' + dir);
                     BuildWorker.addMessage('Filename: ' + filename || location.base);
-                    BuildWorker.addMessage('Upload Uri: ' + JSON.stringify(uploadUrl));
+                    BuildWorker.addMessage('Upload Uri: ' + JSON.stringify(uploadUrl));*/
 
                     process.stdout.write('\u001b[32mOK\u001b[39m\n');
 
@@ -190,20 +192,20 @@ namespace Appveyor {
                     switch (type) {
                         case ArtifactType.Zip:
                             
-                            BuildWorker.addMessage("Zipping with cmd: 7z a " + path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip") + " " + dir);
+                            BuildWorker.addMessage('[' + name + '] Zipping with cmd: 7z a ' + path.normalize(os.tmpdir() + '/sencha-build/' + name + '.zip') + ' ' + dir);
 
                             process.stdout.write('\u001b[36mZipping source\u001b[39m...');
 
                             proc.exec("7z a " + path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip") + " *", { cwd: dir, env: process.env }, (err, stdout, stderr) => {
                                 if (err) {
                                     process.stdout.write('\u001b[31mFAILED\u001b[39m\n');
-                                    BuildWorker.addException('Uploading artifact ' + name + ' failed', err);
+                                    BuildWorker.addException('[' + name + '] Uploading artifact ' + name + ' failed', err);
 
                                     return cb(err);
                                 }
 
                                 var stat = fs.statSync(os.tmpdir() + '/sencha-build/' + name + ".zip");
-                                BuildWorker.addMessage('Artifact size: ' + stat.size);
+                                BuildWorker.addMessage('[' + name + '] Artifact size: ' + stat.size);
 
                                 process.stdout.write('\u001b[32mOK\u001b[39m\n');
 
@@ -213,14 +215,14 @@ namespace Appveyor {
                                     .upload(uploadUrl, path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip"), (err, res, body) => {
                                         if (err) {
                                             process.stdout.write('\u001b[31mFAILED\u001b[39m\n');
-                                            BuildWorker.addException('Uploading artifact file "' + path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip") + '" to "' + uploadUrl + '" failed', err);
+                                            BuildWorker.addException('[' + name + '] Uploading artifact file "' + path.normalize(os.tmpdir() + '/sencha-build/' + name + ".zip") + '" to "' + uploadUrl + '" failed', err);
 
                                             return cb(err);
                                         }
 
                                         process.stdout.write('\u001b[32mOK\u001b[39m\n');
 
-                                        BuildWorker.addMessage('Uploaded artifact ' + name + ' from ' + dir);
+                                        BuildWorker.addMessage('[' + name + '] Uploaded artifact ' + name + ' from ' + dir);
 
                                         cb(null);
                                     })
@@ -229,13 +231,13 @@ namespace Appveyor {
                             break;
 
                         case ArtifactType.WebDeployPackage:
-                            BuildWorker.addMessage("Artifact " + name + " has type WebDeployPackage that isn't implemented");
+                            BuildWorker.addMessage('[' + name + '] Artifact ' + name + ' has type WebDeployPackage that isn\'t implemented');
                             cb(null);
 
                             break;
 
                         case ArtifactType.NuGetPackage:
-                            BuildWorker.addMessage("Artifact " + name + " has type of NuGetPackage that isn't implemented");
+                            BuildWorker.addMessage('[' + name + '] Artifact ' + name + ' has type of NuGetPackage that isn\'t implemented');
                             cb(null);
 
                             break;
@@ -251,20 +253,20 @@ namespace Appveyor {
                                     .upload(uploadUrl, source, (err, res, body) => {
                                         if (err) {
                                             process.stdout.write('\u001b[31mFAILED\u001b[39m\n');
-                                            BuildWorker.addException('Uploading artifact file "' + path.normalize(source) + '" to "' + uploadUrl + '" failed', err);
+                                            BuildWorker.addException('[' + name + '] Uploading artifact file "' + path.normalize(source) + '" to "' + uploadUrl + '" failed', err);
 
                                             cb(err);
                                         }
                                         process.stdout.write('\u001b[32mOK\u001b[39m\n');
 
-                                        BuildWorker.addMessage('Uploaded artifact ' + name + ' from "' + source + '"');
+                                        BuildWorker.addMessage('[' + name + '] Uploaded artifact ' + name + ' from "' + source + '"');
 
                                         cb(null);
                                     })
                             }
                             else {
                                 process.stdout.write('\u001b[36mUploading artifact\u001b[39m...\u001b[31mFAILED\u001b[39m\n');
-                                BuildWorker.addMessage("Artifact " + name + " has type of Auto and the provided location is not a file " + location);
+                                BuildWorker.addMessage('[' + name + '] Artifact ' + name + ' has type of Auto and the provided location is not a file ' + location);
 
                                 cb(null);
                             }
