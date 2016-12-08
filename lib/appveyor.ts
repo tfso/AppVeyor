@@ -182,6 +182,7 @@ namespace Appveyor {
                     BuildWorker.addMessage('Posting of artifact ' + name + ' to API was successful');
                     BuildWorker.addMessage('Directory: ' + dir);
                     BuildWorker.addMessage('Filename: ' + filename || location.base);
+                    BuildWorker.addMessage('Upload Uri: ' + JSON.stringify(uploadUrl));
 
                     process.stdout.write('\u001b[32mOK\u001b[39m\n');
 
