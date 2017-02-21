@@ -1,10 +1,10 @@
 Param
 (
     [String]
-    $PublishProfileFile = '.\' + $ServiceFabricProjectName + '\PublishProfiles\UlvenBeta.xml',
+    $PublishProfileFile = '.\' + $env:ServiceFabricProjectName + '\PublishProfiles\UlvenBeta.xml',
 
     [String]
-    $ApplicationPackagePath = '.\' + $ServiceFabricProjectName + '\pkg\Release',
+    $ApplicationPackagePath = '.\' + $env:ServiceFabricProjectName + '\pkg\Release',
 
     [Switch]
     $DeployOnly = $false,
