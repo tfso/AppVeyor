@@ -27,6 +27,6 @@
     "mocha": "^2.4.5"
   },
   "scripts": {
-    "install" :"powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -WindowStyle Hidden -Command \"$global:SERVICEFABRICSCRIPTS = [string](get-location)\""
+    "install" :"set SERVICEFABRICSCRIPTS=%cd%/ServiceFabric/ && setx SERVICEFABRICSCRIPTS %cd%/ServiceFabric/"
   }
 }
