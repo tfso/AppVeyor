@@ -44,9 +44,12 @@ Param
     [String]
     $StoreName
 )
-
-$connectArgs = @{ ConnectionEndpoint = $ConnectionEndpoint;  X509Credential = $X509Credential;  StoreLocation = $StoreLocation;  StoreName = $StoreName;  ServerCertThumbprint = $ServerCertThumbprint; FindType = $FindType;  FindValue = $FindValue }
-
+if ($X509Credential -eq $true) {
+	$connectArgs = @{ ConnectionEndpoint = $ConnectionEndpoint;  X509Credential = $X509Credential;  StoreLocation = $StoreLocation;  StoreName = $StoreName;  ServerCertThumbprint = $ServerCertThumbprint; FindType = $FindType;  FindValue = $FindValue }
+}
+else {
+	$connectArgs = @{ ConnectionEndpoint = $ConnectionEndpoint }
+}
 try
 {
     Connect-ServiceFabricCluster @connectArgs;
