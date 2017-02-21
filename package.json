@@ -1,6 +1,6 @@
 {
   "name": "appveyor",
-  "version": "0.0.1",
+  "version": "1.0.136",
   "description": "Tools for AppVeyor",
   "main": "app.js",
   "bin": {
@@ -27,6 +27,6 @@
     "mocha": "^2.4.5"
   },
   "scripts": {
-    "install" :"powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -WindowStyle Hidden -Command \"$global:SERVICEFABRICSCRIPTS = [string](get-location)\""
+    "install": "powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -WindowStyle Hidden -Command \"$global:SERVICEFABRICSCRIPTS = [string](get-location)\""
   }
 }
