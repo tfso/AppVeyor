@@ -72,5 +72,8 @@ catch [System.Fabric.FabricObjectClosedException]
     Write-Warning "Service Fabric cluster may not be connected."
     throw
 }
+catch {
+Write-Warning "OH SNAP"
+}
 
 . $PSScriptRoot\Deploy-FabricApplication.ps1 -PublishProfileFile $PublishProfileFile -ApplicationPackagePath $ApplicationPackagePath -OverrideUpgradeBehavior $OverrideUpgradeBehavior -OverwriteBehavior $OverwriteBehavior -DeployOnly:$DeployOnly -UnregisterUnusedApplicationVersionsAfterUpgrade:$UnregisterUnusedApplicationVersionsAfterUpgrade -UseExistingClusterConnection:$true -SkipPackageValidation:$SkipPackageValidation
