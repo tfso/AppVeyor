@@ -72,8 +72,14 @@ catch [System.Fabric.FabricObjectClosedException]
     Write-Warning "Service Fabric cluster may not be connected."
     throw
 }
-catch {
-Write-Warning "OH SNAP"
+try {
+    . $PSScriptRoot\Deploy-FabricApplication.ps1 -PublishProfileFile $PublishProfileFile -ApplicationPackagePath $ApplicationPackagePath -OverrideUpgradeBehavior $OverrideUpgradeBehavior -OverwriteBehavior $OverwriteBehavior -DeployOnly:$DeployOnly -UnregisterUnusedApplicationVersionsAfterUpgrade:$UnregisterUnusedApplicationVersionsAfterUpgrade -UseExistingClusterConnection:$true -SkipPackageValidation:$SkipPackageValidation
 }
-
-. $PSScriptRoot\Deploy-FabricApplication.ps1 -PublishProfileFile $PublishProfileFile -ApplicationPackagePath $ApplicationPackagePath -OverrideUpgradeBehavior $OverrideUpgradeBehavior -OverwriteBehavior $OverwriteBehavior -DeployOnly:$DeployOnly -UnregisterUnusedApplicationVersionsAfterUpgrade:$UnregisterUnusedApplicationVersionsAfterUpgrade -UseExistingClusterConnection:$true -SkipPackageValidation:$SkipPackageValidation
+catch {
+    Write-Warning "Upgrade failed. Trying to publish as a new service."
+    $xml = [xml](Get-Content $PublishProfileFile)
+    $xml.PublishProfile.UpgradeDeployment.Enabled = "false";
+    $xml.Save($PublishProfileFile)
+    Get-Content $PublishProfileFile
+    . $path"Deploy-FabricApplication.ps1" -PublishProfileFile $PublishProfileFile -ApplicationPackagePath $ApplicationPackagePath -OverrideUpgradeBehavior $OverrideUpgradeBehavior -OverwriteBehavior $OverwriteBehavior -DeployOnly:$DeployOnly -UnregisterUnusedApplicationVersionsAfterUpgrade:$UnregisterUnusedApplicationVersionsAfterUpgrade -UseExistingClusterConnection:$true -SkipPackageValidation:$SkipPackageValidation
+}
