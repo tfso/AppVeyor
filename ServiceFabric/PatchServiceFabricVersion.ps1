@@ -13,7 +13,7 @@ $xml.ApplicationManifest.ServiceManifestImport.ServiceManifestRef.ServiceManifes
 $paramApi = $xml.ApplicationManifest.Parameters.Parameter.Clone()
 $paramWorker = $xml.ApplicationManifest.Parameters.Parameter.Clone()
 $paramworker.Name = "ServiceFabricWorker_InstanceCount"
-$paramApi.Name = "ServiceFabricApi_InvoiceCount"
+$paramApi.Name = "ServiceFabricApi_InstanceCount"
 $xml.ApplicationManifest.Parameters.AppendChild($paramApi)
 $xml.ApplicationManifest.Parameters.AppendChild($paramWorker)
 $xml.ApplicationManifest.Parameters.RemoveChild($xml.ApplicationManifest.Parameters.Parameter[0])
