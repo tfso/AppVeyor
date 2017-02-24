@@ -1,7 +1,7 @@
 Param
 (
     [String]
-    $PublishProfileFile = '.\' + $env:ServiceFabricProjectName + '\PublishProfiles\UlvenBeta.xml',
+    $PublishProfileFile = $PSScriptRoot + '\PublishProfiles\UlvenBeta.xml',
 
     [String]
     $ApplicationPackagePath = '.\' + $env:ServiceFabricProjectName + '\pkg\Release',
