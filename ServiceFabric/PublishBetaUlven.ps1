@@ -44,6 +44,14 @@ Param
     [String]
     $StoreName
 )
+
+
+$xmlPath = $PSScriptRoot + "\ApplicationParametersUlvenBeta.xml"
+$xml = [xml](Get-Content $xmlPath)
+$xml.Application.Name = "fabric:/" + $env:ServiceFabricProjectName
+$xml.Save($xmlPath)
+Get-Content $xmlPath
+
 if ($X509Credential -eq $true) {
 	$connectArgs = @{ ConnectionEndpoint = $ConnectionEndpoint;  X509Credential = $X509Credential;  StoreLocation = $StoreLocation;  StoreName = $StoreName;  ServerCertThumbprint = $ServerCertThumbprint; FindType = $FindType;  FindValue = $FindValue }
 }
