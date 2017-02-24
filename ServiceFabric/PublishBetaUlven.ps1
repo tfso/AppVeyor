@@ -81,5 +81,5 @@ catch {
     $xml.PublishProfile.UpgradeDeployment.Enabled = "false";
     $xml.Save($PublishProfileFile)
     Get-Content $PublishProfileFile
-    . $path"Deploy-FabricApplication.ps1" -PublishProfileFile $PublishProfileFile -ApplicationPackagePath $ApplicationPackagePath -OverrideUpgradeBehavior $OverrideUpgradeBehavior -OverwriteBehavior $OverwriteBehavior -DeployOnly:$DeployOnly -UnregisterUnusedApplicationVersionsAfterUpgrade:$UnregisterUnusedApplicationVersionsAfterUpgrade -UseExistingClusterConnection:$true -SkipPackageValidation:$SkipPackageValidation
+    . $PSScriptRoot\Deploy-FabricApplication.ps1 -PublishProfileFile $PublishProfileFile -ApplicationPackagePath $ApplicationPackagePath -OverrideUpgradeBehavior $OverrideUpgradeBehavior -OverwriteBehavior $OverwriteBehavior -DeployOnly:$DeployOnly -UnregisterUnusedApplicationVersionsAfterUpgrade:$UnregisterUnusedApplicationVersionsAfterUpgrade -UseExistingClusterConnection:$true -SkipPackageValidation:$SkipPackageValidation
 }
