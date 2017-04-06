@@ -27,7 +27,7 @@ Param
     $SkipPackageValidation = $false,
 
     [String]
-    $ConnectionEndpoint = '213.179.54.43:19000',
+    $ConnectionEndpoint = '213.179.54.42:19000',
 
     [String]
     $ServerCertThumbprint,
