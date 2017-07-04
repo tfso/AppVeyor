@@ -14,10 +14,10 @@ install:
   - ps: Install-Product node $env:nodejs_version
   # install modules
   - npm install
-  #- ps: git config --global user.email "tfsobob@24sevenoffice.com"
-  #- ps: git config --global user.name "tfsobob"
 
 build_script:
+  - node node_modules/typescript/bin/tsc
+
   - echo Patching version %appveyor_build_version%
   - node ./bin/patch-version
   
