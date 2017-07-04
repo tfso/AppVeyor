@@ -6,8 +6,6 @@ import proc = require('child_process');
 import AppVeyor from './../appveyor';
 import { IConfiguration } from './common';
 import { Command } from './command';
-import patchVersion from './../patch-version';
-
 
 export enum ModuleType {
     Package,
@@ -91,7 +89,7 @@ export class Module extends events.EventEmitter implements IModule {
             this.emit('stdout', 'Building "\u001b[36m' + this.name + '\u001b[39m"\n');
             this.emit('stdout', 'Patching from version ' + this.version + ' to ' + newversion + ' based at ' + ((this.type == ModuleType.Package && options && options.keepPackageVersion) || (this.type == ModuleType.Application && options && options.keepAppVersion) ? this.version : 'N/A') + '\n');
 
-            await patchVersion(this.location, newversion, null, null);
+            await this.patchVersion(this.location, newversion);
 
             await Command.execute(
                 ['config', '-prop', 'skip.slice=1', /*'-prop', 'skip.sass=1',*/ 'then', (this.type == ModuleType.Package ? 'package' : 'app'), 'build', (this.type == ModuleType.Application ? 'production' : '')],
@@ -108,4 +106,19 @@ export class Module extends events.EventEmitter implements IModule {
             throw ex;
         }
     }
+
+    private async patchVersion(file: string, version: string): Promise<void> {
+        let packagePath = path.normalize(file),
+            content = await fsp.readFile(packagePath);
+
+        content = content.replace(/("(?:(?:\\[^\n]|[^""\n])*)")|\/\*(.|\n|\r\n)*?\*\/|(?:\/\/.*$)/mgi, "$1");
+        var json = JSON.parse(content);
+
+        if (json.sencha && json.sencha.version)
+            json.sencha.version = version;
+        else
+            json.version = version;
+
+        await fsp.writeFile(packagePath, JSON.stringify(json, null, 2) + '\n');
+    };
 }

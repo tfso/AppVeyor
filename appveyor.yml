@@ -39,7 +39,9 @@ artifacts:
   name: tfso.tools.appveyor
 
 deploy_script:
-  - echo scripting to deploy to npm or github releases
-  - git commit -a -m "Modifying version to %appveyor_build_version%"
-  - git tag -a %appveyor_build_version% -m "Release of version %appveyor_build_version%"
-  - git push origin --tags
+  # git tagging source for github releases in addition to artifact to make npm usage useful
+  - git add ./**/*.js
+  - git add ./**/*.js.map
+  - git commit -a -m "Adding release files"
+  - git tag -a %appveyor_build_version% -m "%APPVEYOR_REPO_COMMIT_MESSAGE% %APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED%"
+  - git push origin %appveyor_build_version%
