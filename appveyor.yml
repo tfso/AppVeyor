@@ -1,5 +1,4 @@
-﻿# Test against this version of Node.js
-version: 1.1.{build}
+﻿version: 1.1.{build}
 environment:
   nodejs_version: "6"
 
@@ -42,6 +41,7 @@ deploy_script:
   # git tagging source for github releases in addition to artifact to make npm usage useful
   - git config --global user.email "post@24sevenoffice.com"
   - git config --global user.name "24SevenOffice"
+  - git rm .gitignore
   - git add -f --all
   - git commit -a -m "Adding release files"
   - git tag -a %appveyor_build_version% -m "%APPVEYOR_REPO_COMMIT_MESSAGE% %APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED%"
