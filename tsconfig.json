@@ -1,7 +1,7 @@
 ﻿{
     "compileOnSave": true,
     "compilerOptions": {
-        "target": "ES5",
+        "target": "ES6",
         "module": "commonjs",
         "noEmitOnError": true,
         "experimentalDecorators": true,

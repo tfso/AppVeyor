@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import sencha from './../lib/sencha';
+import * as sencha from './../lib/sencha';
 import appveyor from './../lib/appveyor';
 
 import path = require('path');
