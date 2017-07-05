@@ -5,7 +5,7 @@
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
     <Name>AppVeyor</Name>
     <RootNamespace>AppVeyor</RootNamespace>
-    <ScriptArguments>build --path F:\Source\Workspaces\Sencha\extjs-tfso-lib-core --keepPackageVersion</ScriptArguments>
+    <ScriptArguments>repository list</ScriptArguments>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -13,7 +13,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>859ccbc2-1d98-448a-8282-9eeaebe944d4</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>bin\build-sencha.ts</StartupFile>
+    <StartupFile>bin\sencha.ts</StartupFile>
     <StartWebBrowser>False</StartWebBrowser>
     <SearchPath>
     </SearchPath>
