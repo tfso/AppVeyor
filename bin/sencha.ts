@@ -21,6 +21,9 @@ if (program['senchaCmd'])
     SENCHACMD = program['senchaCmd'];
 
 Command.path = SENCHACMD;
-Command.execute(program.args, process.stdout.write)
-    .then(() => process.exit(0))
-    .catch(() => process.exit(-1))
+
+new Command()
+    .on('stdout', data => process.stdout.write(data))
+    .execute(...program.args)
+        .then(() => process.exit(0))
+        .catch(() => process.exit(-1))

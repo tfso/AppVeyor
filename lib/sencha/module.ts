@@ -91,11 +91,9 @@ export class Module extends events.EventEmitter implements IModule {
 
             await this.patchVersion(this.location, newversion);
 
-            await Command.execute(
-                ['config', '-prop', 'skip.slice=1', /*'-prop', 'skip.sass=1',*/ 'then', (this.type == ModuleType.Package ? 'package' : 'app'), 'build', (this.type == ModuleType.Application ? 'production' : '')],
-                this.output.bind(this),
-                path.dirname(this.location)
-            );
+            await new Command({ cwd: path.dirname(this.location) })
+                .on('stdout', data => this.output(data))
+                .execute('config', '-prop', 'skip.slice=1', /*'-prop', 'skip.sass=1',*/ 'then', (this.type == ModuleType.Package ? 'package' : 'app'), 'build', (this.type == ModuleType.Application ? 'production' : ''))
 
             this.emit('close', 0, null);
         }

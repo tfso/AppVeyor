@@ -11,39 +11,47 @@ import AppVeyor from './../appveyor';
 
 export class Command extends events.EventEmitter {
     private _lastOutputWithLF = false
+    private options: Object = {};
 
     public static path: string;
 
-    constructor() {
+    constructor(options?: Object) {
         super();
+
+        this.options = Object.assign(this.options, {
+            env: process.env,
+            cwd: process.cwd() 
+        }, options);
     }
 
-    public output(std: string | Buffer) {
-        Command.parseOutput(std)
-            .forEach((line) => {
-                if (this._lastOutputWithLF == false && line.length > 1)
-                {
-                    this._lastOutputWithLF = true;
-                    this.emit('stdout', '\n');
-                }
+    public output(std: string | Buffer): string {
+        let out: string = '';
 
-                if (line.length == 1)
-                {
-                    this.emit('stdout', line); this._lastOutputWithLF = false;
-                } else
-                {
-                    this.emit('stdout', line + '\n');
-                }
-            })
+        for (let line of Command.parseOutput(std)) {
+            if (this._lastOutputWithLF == false && line.length > 1) {
+                this.emit('stdout', '\n'); this._lastOutputWithLF = true;
+                out += '\n';
+            }
+
+            if (line.length == 1) {
+                this.emit('stdout', line); this._lastOutputWithLF = false;
+                out += line;
+
+            } else {
+                this.emit('stdout', line + '\n');
+                out += line + '\n';
+            }
+        }
+
+        return out;
     }
 
     public static parseOutput(std: string | Buffer): string[] {
-        var regex = /^(?:\[([A-Z]{3})\])?\s*(.+)$/mgi,
+        var regex = /^(?:\[([A-Z]{3})\])?[\s\t]?(.+)([\r\n]+|$)/mgi,
             match, output = [];
 
         while ((match = regex.exec(std.toString())) != null)
         {
-
             switch (match[1])
             {
                 case "INF":
@@ -66,63 +74,32 @@ export class Command extends events.EventEmitter {
         return output;
     }
 
-    public static addRepository(name: string, url: string, callback?: (err: Error, output?: string) => void): Promise<string> {
-        var execute = new Promise<string>((resolve, reject) => {
-            var err, output = [],
-                cmd = proc.spawn(Command.path || 'sencha.exe', ['repository', 'add', name, url], { env: process.env });
-
-
-            cmd.stdout.on('data', (data) => {
-                output.push(Command.parseOutput(data));
-            })
-
-            cmd.stderr.on('data', (data) => {
-                output.push(Command.parseOutput(data));
-            })
-
-            cmd.on('error', (ex) => {
-                err = ex;
-            })
-
-            cmd.on('close', (code) => {
-                if (code != 0)
-                {
-                    reject(err || new Error('Adding repository to workspace failed (' + code + ')'));
-                }
-                else
-                {
-                    resolve(output.join('\n'));
-                }
-            })
-        });
-
-        if (callback != null)
-        {
-            // callback
-            execute.then((output) => { callback(null, output); }).catch((err) => { callback(err); });
-        }
-        else
-        {
-            // promise
-            return execute;
-        }
+    public static async addRepository(name: string, url: string): Promise<string> {
+        return await new Command().addRepository(name, url);
     }
 
-    public static async execute(args: string[], output?: (data: string | Buffer) => void, cwd?: string) : Promise<void> {
+    public async addRepository(name: string, url: string): Promise<string> {
+        return await this.execute('repository', 'add', name, url);
+    }
+
+    public static async execute(args: string[], cwd?: string): Promise<string> {
+        return await new Command(cwd ? { cwd: cwd } : null).execute(...args)
+    }
+
+    public async execute(...args: string[]) : Promise<string> {
         let err: any = null,
-            cmd: proc.ChildProcess;
+            cmd: proc.ChildProcess,
+            output: string = '';
 
         await new Promise((resolve, reject) => {
-            cmd = proc.spawn(Command.path || 'sencha.exe', args, { cwd: cwd || process.cwd(), env: process.env });
+            cmd = proc.spawn(Command.path || 'sencha.exe', args, this.options);
 
             cmd.stdout.on('data', (data) => {
-                if (output)
-                    Command.parseOutput(data).forEach((line) => output(line))
+                output += this.output(data)
             })
 
             cmd.stderr.on('data', (data) => {
-                if (output)
-                    Command.parseOutput(data).forEach((line) => output(line))
+                output += this.output(data)
             })
 
             cmd.on('error', (ex) => {
@@ -130,8 +107,7 @@ export class Command extends events.EventEmitter {
             })
 
             cmd.on('close', (code) => {
-                if (code != 0)
-                {
+                if (code != 0) {
                     err = err || new Error();
                     err.code = code;
 
@@ -144,7 +120,12 @@ export class Command extends events.EventEmitter {
             })
         })
         
-        return;
+        return output
+    }
+
+   
+    public async install(url: string, destination?: string): Promise<string> {
+        return await Command.install(url, destination);
     }
 
     public static async install(url: string, destination?: string): Promise<string> {

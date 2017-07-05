@@ -121,25 +121,20 @@ export class Workspace extends events.EventEmitter implements IWorkspace {
         {
                 this.emit('close', ex.code || -1, ex);
         }
-                        
-
     }
 
     public async upgrade(): Promise<void> {
         try
         {
-            await Command.execute(
-                ['framework', 'upgrade', 'ext', this.sdk || "ext"],
-                this.output.bind(this),
-                this.workspace
-            );
+            await new Command({ cwd: this.workspace })
+                .on('stdout', data => this.output(data))
+                .execute('framework', 'upgrade', 'ext', this.sdk || "ext")
 
             this.emit('close', 0, null);
         }
         catch (ex)
         {
             this.emit('close', ex.code || -1, ex);
-
             throw ex;
         }      
     }
@@ -147,7 +142,9 @@ export class Workspace extends events.EventEmitter implements IWorkspace {
     public async install(): Promise<void> {
         try
         {
-            await Command.execute(['framework', 'add', 'ext', this.sdk || "ext"], this.output.bind(this), this.workspace);
+            await new Command({ cwd: this.workspace })
+                .on('stdout', data => this.output(data))
+                .execute('framework', 'add', 'ext', this.sdk || "ext");
 
             this.emit('close', 0, null);
         }
