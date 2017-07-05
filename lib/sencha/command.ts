@@ -134,15 +134,17 @@ export class Command extends events.EventEmitter {
         let executable = await Command.download(url);
 
         var err,
-            cmd = proc.spawn(executable, ['-a', '-q', '-dir', destination], {});
+            cmd = proc.spawn(executable, ['-a', '-q', '-dir', destination], {}),
+            location = path.normalize(destination + "/sencha.exe");
 
         try
         {
-            let location = await new Promise<string>((resolve, reject) => {
+            await new Promise<string>((resolve, reject) => {
                 let err: Error,
                     errMessage: string;
 
                 cmd.on('stdout', (t) => {
+                    if (t) { }
                 })
 
                 cmd.on('stderr', (t) => {
@@ -157,18 +159,18 @@ export class Command extends events.EventEmitter {
                     if (code != 0)
                         return reject(err || new Error(errMessage));
                     
-                    return resolve(path.normalize(destination + "/sencha.exe"));
+                    return resolve();
                 })
             });
 
-            AppVeyor.BuildWorker.addMessage('Installed Sencha Cmd at ' + localStorage);
-
-            return Command.path = location;
+            AppVeyor.BuildWorker.addMessage('Installed Sencha Cmd at ' + location);
         }
         catch (ex)
         {
             AppVeyor.BuildWorker.addException('Installation of Sencha Command failed', ex);
         }
+
+        return Command.path = location;
     }
 
     private static download(url: string): Promise<string> {
