@@ -20,8 +20,13 @@ var SENCHACMD = process.env.SENCHACMD || program['senchaCmd'] || null;
 if(SENCHACMD)
     Command.path = SENCHACMD;
 
+process.stdout.write('Using SENCHACMD from "' + Command.path + '"');
+
 new Command()
     .on('stdout', data => process.stdout.write(data))
     .execute(...program.args)
-        .then(() => process.exit(0))
-        .catch(() => process.exit(-1))
+    .then(() => process.exit(0))
+    .catch((err: Error) => {
+        process.stdout.write('Error; ' + err.name + " - " + err.message);
+        process.exit(-1);
+    })
