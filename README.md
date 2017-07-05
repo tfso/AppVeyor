@@ -1,8 +1,8 @@
-﻿# AppVeyor Command-line tools
+# AppVeyor Command-line tools
 
 ## Installation
 
-    npm install -g tfso/appveyor
+    npm install -g tfso/appveyor#1.1.162
     
 ## Requirements
 
@@ -39,7 +39,7 @@ build_script:
 
 ## Usage
 
-### path-version
+### patch-version
 ```
   Usage: patch-version [options] <file>
 
