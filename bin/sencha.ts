@@ -15,12 +15,10 @@ program
 if (program.args.length == 0)
     program.help();
 
-var SENCHACMD = process.env.SENCHACMD || "sencha.exe";
+var SENCHACMD = process.env.SENCHACMD || program['senchaCmd'] || null;
 
-if (program['senchaCmd'])
-    SENCHACMD = program['senchaCmd'];
-
-Command.path = SENCHACMD;
+if(SENCHACMD)
+    Command.path = SENCHACMD;
 
 new Command()
     .on('stdout', data => process.stdout.write(data))
