@@ -72,7 +72,7 @@ program
     .option('-x, --keepAppVersion', 'Flag to keep app version instead of replacing it with appveyor version')
     .option('-j, --jsb <file>', 'Old style using the jsb that contains all of your project files')
     .option('-s, --sdk <path>', 'Path or Package name to Sencha framework')
-    .action((options) => {
+    .action(async (options) => {
         if (options.parent.senchaCmd)
             sencha.Command.path = options.parent.senchaCmd
 
@@ -124,16 +124,18 @@ program
             if (options.buildOnly == 'app') buildType = sencha.ModuleType.Application;
             if (options.buildOnly == 'package') buildType = sencha.ModuleType.Package;
 
-            workspace.build({ buildOnly: buildType, keepPackageVersion: (options.keepPackageVersion !== undefined ? options.keepPackageVersion === true : false), keepAppVersion: (options.keepAppVersion !== undefined ? options.keepAppVersion === true : false) })
-                .then(() => {
-                    process.stdout.write('\u001b[36mDone building\u001b[39m\n');
-                    process.exit(0);
-                })
-                .catch((err) => {
-                    process.stdout.write("Failed; Workspace Build\n");
-                    process.exit(1);
-                })
-               
+            try {
+                await workspace.refresh();
+                await workspace.build({ buildOnly: buildType, keepPackageVersion: (options.keepPackageVersion !== undefined ? options.keepPackageVersion === true : false), keepAppVersion: (options.keepAppVersion !== undefined ? options.keepAppVersion === true : false) })
+
+                process.stdout.write('\u001b[36mDone building\u001b[39m\n');
+                process.exit(0);
+            }
+            catch (err) 
+            {
+                process.stdout.write("Failed; Workspace Build\n");
+                process.exit(1);
+            }
         }
     })
 

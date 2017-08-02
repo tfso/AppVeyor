@@ -155,6 +155,22 @@ export class Workspace extends events.EventEmitter implements IWorkspace {
         }
     }
 
+    public async refresh(): Promise<void> {
+        try
+        {
+            await new Command({ cwd: this.workspace })
+                .on('stdout', data => this.output(data))
+                .execute('workspace', 'install');
+
+            this.emit('close', 0, null);
+        }
+        catch (ex)
+        {
+            this.emit('close', ex.code || -1, ex);
+            throw new Error('Upgrading workspace failed (' + ex.code + ': ' + ex.description + ')');
+        }
+    }
+
     public async build(options?: IBuildConfiguration): Promise<void> {
         try
         {
