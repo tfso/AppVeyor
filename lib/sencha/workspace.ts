@@ -158,9 +158,19 @@ export class Workspace extends events.EventEmitter implements IWorkspace {
     public async refresh(): Promise<void> {
         try
         {
-            await new Command({ cwd: this.workspace })
-                .on('stdout', data => this.output(data))
-                .execute('workspace', 'install');
+            let modules = await this.getModules();
+
+            for (let module of modules)
+            {
+                if (module.type == ModuleType.Application)
+                {
+                    this.emit('stdout', 'Upgrading application "\u001b[36m' + module.name + '\u001b[39m" at "' + path.dirname(module.location) + '"\n');
+
+                    await new Command({ cwd: path.dirname(module.location) })
+                        .on('stdout', data => this.output(data))
+                        .execute('framework', 'upgrade', 'ext', 'ext');
+                }
+            }
 
             this.emit('close', 0, null);
         }
