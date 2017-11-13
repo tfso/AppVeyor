@@ -15,9 +15,9 @@ export interface IWorkspace extends events.EventEmitter {
     workspace: string
     sdk: string
 
-    upgrade(callback?: (err: Error) => void): Promise<any>
-    build(options?: IBuildConfiguration, callback?: (err: Error) => void): Promise<any>
-    publish(url?: string, callback?: (err: Error) => void): Promise<any>
+    upgrade(): Promise<any>
+    build(options?: IBuildConfiguration, ): Promise<any>
+    publish(url?: string, type?: ModuleType): Promise<any>
 }
 
 export class Workspace extends events.EventEmitter implements IWorkspace {
@@ -53,16 +53,21 @@ export class Workspace extends events.EventEmitter implements IWorkspace {
             })
     }
 
-    public async publish(url?: string): Promise<void> {
+    public async publish(url?: string, type?: ModuleType): Promise<void> {
         try {
             let buildPath = this.workspace + "/build/", // this may default to something else, check .sencha/workspace/sencha.cfg
                 modules = await this.getModules();
      
             await this.sync(modules.map((module) => {
                 return async () => {
+                    if (type != null && module.type != type)
+                        return;
+
                     switch (module.type)
                     {
                         case ModuleType.Application:
+                            // zip first? this will always fail
+
                             await new Promise((resolve, reject) => 
                                 AppVeyor.BuildWorker.addArtifact(module.name, path.normalize(buildPath + 'production/' + module.name + '/'), module.name + ".zip", AppVeyor.ArtifactType.Zip, (err) => { if (err) return reject(err); resolve(); })
                             );

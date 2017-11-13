@@ -169,16 +169,25 @@ namespace Appveyor {
 
             process.stdout.write('\u001b[36mAdding artifact\u001b[39m ' + name + '...');
 
+            if (fs.existsSync(path.join(dir, filename)) == false)
+            {
+                process.stdout.write('\u001b[31mFAILED\u001b[39m\n');
+
+                this.addException('Uploading artifact ' + name + ' to appveyor failed', new Error('File ' + path.join(dir, filename) + ' does not exists'));
+
+                return cb(null);
+            }
+
             BuildWorker.getInstance()
                 .request
-                .post('api/artifacts', { name: name, path: path.join(dir, filename), fileName: filename || location.base, type: (type ? ArtifactType[type] : ArtifactType[ArtifactType.Auto]) }, (err, response, options) => {
+                .post('api/artifacts', { name: name, path: dir, fileName: filename || location.base, type: (type ? ArtifactType[type] : ArtifactType[ArtifactType.Auto]) }, (err, response, options) => {
                     if (err || response.statusCode > 299)
                     { // api/artifacts body isn't a valid json
                         if (!err)
                             err = new Error(`Http post to /api/artifacts failed with status ${response.statusCode}; \n\n${JSON.stringify(options, null, ' ')}`);
 
                         process.stdout.write('\u001b[31mFAILED\u001b[39m\n');
-                        process.stdout.write(JSON.stringify({ url: '/api/artifacts', statusCode: response.statusCode, body: options, artifact: { name: name, path: dir, fileName: filename || location.base, type: (type ? ArtifactType[type] : ArtifactType[ArtifactType.Auto]) } }, null, ' ') + '\n\n');
+                        //process.stdout.write(JSON.stringify({ url: '/api/artifacts', statusCode: response.statusCode, body: options, artifact: { name: name, path: dir, fileName: filename || location.base, type: (type ? ArtifactType[type] : ArtifactType[ArtifactType.Auto]) } }, null, ' ') + '\n\n');
 
                         this.addException('Posting artifact ' + name + ' to appveyor failed', err);
 

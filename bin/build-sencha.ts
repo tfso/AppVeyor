@@ -52,12 +52,18 @@ program
     .command('publish [url]')
     .description('Publishing artifacts of apps and packages to appveyor, but if url is defined will packages be posted to repository instead')
     .option('-p, --path <workspace>', 'Path to workspace', path.normalize, process.cwd())
+    .option('-t, --typeOnly <type>', 'Publish either package or app', /^(app|package)$/i, 'all')
     .action((url, options) => {
+
+        var typeOnly = null;
+        if (options.typeOnly == 'app') typeOnly = sencha.ModuleType.Application;
+        if (options.typeOnly == 'package') typeOnly = sencha.ModuleType.Package;
+
         var workspace = new sencha.Workspace({
             path: options.path
         });
 
-        workspace.publish(url)
+        workspace.publish(url, typeOnly)
             .then(() => { process.exit(0) })
             .catch((err) => { process.exit(1) });
     })
