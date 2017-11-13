@@ -172,7 +172,11 @@ namespace Appveyor {
             BuildWorker.getInstance()
                 .request
                 .post('api/artifacts', { name: name, path: dir, fileName: filename || location.base, type: (type ? ArtifactType[type] : ArtifactType[ArtifactType.Auto]) }, (err, response, options) => {
-                    if (err || response.statusCode > 299) { // api/artifacts body isn't a valid json
+                    if (err || response.statusCode > 299)
+                    { // api/artifacts body isn't a valid json
+                        if (!err)
+                            err = new Error(`Http post to /api/artifacts failed with status ${response.statusCode}; \n\n${JSON.stringify(options, null, ' ')}`);
+
                         process.stdout.write('\u001b[31mFAILED\u001b[39m\n');
                         this.addException('Posting artifact ' + name + ' to appveyor failed', err);
 
