@@ -171,7 +171,7 @@ namespace Appveyor {
 
             BuildWorker.getInstance()
                 .request
-                .post('api/artifacts', { name: name, path: dir, fileName: filename || location.base, type: (type ? ArtifactType[type] : ArtifactType[ArtifactType.Auto]) }, (err, response, options) => {
+                .post('api/artifacts', { name: name, path: path.join(dir, filename), fileName: filename || location.base, type: (type ? ArtifactType[type] : ArtifactType[ArtifactType.Auto]) }, (err, response, options) => {
                     if (err || response.statusCode > 299)
                     { // api/artifacts body isn't a valid json
                         if (!err)
