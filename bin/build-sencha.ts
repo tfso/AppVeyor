@@ -131,7 +131,7 @@ program
             if (options.buildOnly == 'package') buildType = sencha.ModuleType.Package;
 
             try {
-                await workspace.refresh();
+                // await workspace.refresh(); // this will actually run 'framework upgrade ext ext'
                 await workspace.build({ buildOnly: buildType, keepPackageVersion: (options.keepPackageVersion !== undefined ? options.keepPackageVersion === true : false), keepAppVersion: (options.keepAppVersion !== undefined ? options.keepAppVersion === true : false) })
 
                 process.stdout.write('\u001b[36mDone building\u001b[39m\n');
