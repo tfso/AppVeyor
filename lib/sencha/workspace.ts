@@ -173,7 +173,7 @@ export class Workspace extends events.EventEmitter implements IWorkspace {
 
                     await new Command({ cwd: path.dirname(module.location) })
                         .on('stdout', data => this.output(data))
-                        .execute('framework', 'upgrade', 'ext', 'ext');
+                        .execute('framework', 'upgrade', 'ext', this.sdk || 'ext');
                 }
             }
 
@@ -322,7 +322,7 @@ export class Workspace extends events.EventEmitter implements IWorkspace {
                                     if (res.value instanceof Promise)
                                         promise = res.value;
                                     else if (typeof res.value == 'function' && (<Function>res.value).length == 2)
-                                        promise = new Promise(res.value);
+                                        promise = new Promise(res.value as any);
                                     else if (typeof res.value == 'function')
                                         promise = (<Function>res.value).call(undefined);
                                     else
