@@ -6,7 +6,8 @@
         "noEmitOnError": true,
         "experimentalDecorators": true,
         "suppressImplicitAnyIndexErrors": true,
-        "sourceMap": true
+        "sourceMap": true,
+        "skipLibCheck": true
     },
     "exclude": [
         "node_modules"
