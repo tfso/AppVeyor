@@ -18,7 +18,7 @@ install:
 build_script:
   - node node_modules/typescript/bin/tsc
 
-  - echo Patching version %appveyor_build_version%
+  - echo Patching version $APPVEYOR_BUILD_VERSION
   - node ./bin/patch-version
 
 test_script:
@@ -41,5 +41,5 @@ deploy_script:
   - git rm .gitignore
   - git add -f --all
   - git commit -a -m "Adding release files"
-  - git tag -a %appveyor_build_version% -m "%APPVEYOR_REPO_COMMIT_MESSAGE% %APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED%"
-  - git push origin %appveyor_build_version%
+  - git tag -a $APPVEYOR_BUILD_VERSION -m "$APPVEYOR_REPO_COMMIT_MESSAGE $APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED"
+  - git push origin $APPVEYOR_BUILD_VERSION
