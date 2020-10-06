@@ -1,6 +1,8 @@
-﻿version: 1.1.{build}
+﻿image: Ubuntu1804
+stack: node 12
+
+version: 1.1.{build}
 environment:
-  nodejs_version: "6"
   access_token:
     secure: sbBna4fwB5pwz2FWSkskL1UJZLvZmSQ5/tItIVC3ESN+gefKxwXIhj0IHXUATpmo
 
@@ -11,9 +13,6 @@ branches:
 skip_tags: true
 
 install:
-  # Get the latest stable version of Node.js or io.js
-  - ps: Install-Product node $env:nodejs_version
-  # install modules
   - npm install
 
 build_script:
@@ -36,7 +35,7 @@ artifacts:
 deploy_script:
   # git tagging source for github releases in addition to artifact to make npm usage useful
   - git config --global credential.helper store
-  - ps: Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"  
+  - ps: Add-Content "$HOME\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"
   - git config --global user.email "post@24sevenoffice.com"
   - git config --global user.name "24SevenOffice"
   - git rm .gitignore
