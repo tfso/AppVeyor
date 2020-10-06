@@ -29,6 +29,6 @@
             "mocha": "^2.5.3"
       },
       "scripts": {
-            "install": "set SERVICEFABRICSCRIPTS=%cd%/ServiceFabric/ && setx SERVICEFABRICSCRIPTS %cd%/ServiceFabric/"
+            "install-bak": "set SERVICEFABRICSCRIPTS=%cd%/ServiceFabric/ && setx SERVICEFABRICSCRIPTS %cd%/ServiceFabric/"
       }
 }
