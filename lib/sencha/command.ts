@@ -179,28 +179,34 @@ export class Command extends events.EventEmitter {
             {
                 var request = http.get(url, function (response) {
                     var isExtracting = false;
+                    if (url.endsWith('.zip')) {
+                        response.pipe(unzip.Parse())
+                            .on('entry', (entry) => {
+                                var fileName = entry.path;
+                                if (fileName.slice(-3) === "exe")
+                                {
+                                    isExtracting = true;
 
-                    response.pipe(unzip.Parse())
-                        .on('entry', (entry) => {
-                            var fileName = entry.path;
-                            if (fileName.slice(-3) === "exe")
-                            {
-                                isExtracting = true;
-
-                                var destination = path.normalize(os.tmpdir() + "/" + fileName);
-                                entry.pipe(fs.createWriteStream(destination))
-                                    .on('close', () => {
-                                        resolve(destination);
-                                    });
-                            } else
-                            {
-                                entry.autodrain();
-                            }
-                        })
-                        .on('close', () => {
-                            if (isExtracting === false)
-                                reject(new Error('Not executable in zip archive at ' + url));
-                        })
+                                    var destination = path.normalize(os.tmpdir() + "/" + fileName);
+                                    entry.pipe(fs.createWriteStream(destination))
+                                        .on('close', () => {
+                                            resolve(destination);
+                                        });
+                                } else
+                                {
+                                    entry.autodrain();
+                                }
+                            })
+                            .on('close', () => {
+                                if (isExtracting === false)
+                                    reject(new Error('Not executable in zip archive at ' + url));
+                            })
+                    }else {
+                        var split = url.split('/');
+                        var fileName = split[split.length-1];
+                        var destination = path.normalize(os.tmpdir() + "/" + fileName);
+                        response.pipe(fs.createWriteStream(destination)).on('finish', () => resolve(destination));
+                    }
 
                 }).on('error', (err) => {
                     reject(err);
