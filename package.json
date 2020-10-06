@@ -17,15 +17,15 @@
             "url": "git+https://github.com/tfso/appveyor.git"
       },
       "dependencies": {
-            "async": "^2.0.0-rc.4",
             "commander": "^2.9.0",
             "request-json": "^0.5.6",
             "unzip": "^0.1.11"
       },
       "devDependencies": {
-            "@types/node": "^7.0.5",
+            "@types/node": "^12",
             "@types/mocha": "^2.2.39",
-            "typescript": "~2.3.3",
+            "@types/commander": "2.12.2",
+            "typescript": "^3",
             "mocha": "^2.5.3"
       },
       "scripts": {

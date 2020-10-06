@@ -126,13 +126,13 @@ namespace Appveyor {
             //}
         }
 
-        public static addException(message: string, err: NodeJS.ErrnoException): void {
+        public static addException(message: string, err: Error): void {
             BuildWorker.getInstance()
                 .request
                 .post('api/build/messages', { message: message, details: err.name + ': ' + err.message, category: 'error' });
         }
 
-        public static addTest(name: string, filename: string, framework?: string, duration?: number, err?: NodeJS.ErrnoException): void {
+        public static addTest(name: string, filename: string, framework?: string, duration?: number, err?: Error): void {
             BuildWorker.getInstance()
                 .request
                 .post('api/tests', { testName: name, testFramework: framework, fileName: filename, outcome: err ? 'Failed' : 'Passed', durationMilliseconds: duration || 0, ErrorMessage: err ? err.message : "", ErrorStackTrace: err ? err.stack || "" : "" });
