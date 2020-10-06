@@ -26,7 +26,7 @@ test_script:
   - node node_modules/mocha/bin/_mocha tests/ --no-exit
 
 after_test:
-  - FOR /f %%n IN ('dir .\node_modules /d /b /a:d ^| findstr /R /C:"^[A-Za-z].*$"') DO npm uninstall %%n
+  - npm prune --production
 
 artifacts:
 - path: '\'
