@@ -34,9 +34,9 @@ artifacts:
 
 deploy_script:
   # git tagging source for github releases in addition to artifact to make npm usage useful
-  - git config --global credential.helper store
-  - ps: Add-Content "$HOME/.git-credentials" "https://$env:access_token:x-oauth-basic@github.com"
-  - ps: cat $HOME\.git-credentials
+  - git config --global credential.helper "store --file ~/.git-credentials"
+  - ps: Add-Content Join-Path $HOME ".git-credentials" "https://$env:access_token:x-oauth-basic@github.com"
+  - ps: cat Join-Path $HOME ".git-credentials"
   - git config --global user.email "post@24sevenoffice.com"
   - git config --global user.name "24SevenOffice"
   - git rm .gitignore
