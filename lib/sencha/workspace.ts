@@ -104,7 +104,7 @@ export class Workspace extends events.EventEmitter implements IWorkspace {
                                 }
                                 catch (ex)
                                 {
-                                    process.stdout.write('\u001b[31mFAILED\u001b[39m\n');
+                                    process.stdout.write('\u001b[31mFAILED\u001b[39m\n (' + ex + ')');
                                     AppVeyor.BuildWorker.addException('Uploading artifact ' + module.name + ' failed', ex)
                                 }
                             }
