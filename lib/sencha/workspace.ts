@@ -84,14 +84,17 @@ export class Workspace extends events.EventEmitter implements IWorkspace {
                                 }
 
                                 process.stdout.write('\u001b[36mUploading artifact \u001b[39m' + module.name + ' \u001b[36mto remote repository\u001b[39m...');
+                                process.stdout.write('\u001b[36mfrom \u001b[39m' +  buildPath + module.name + '/' + module.name + ".pkg" + '...');
                                 var req = request.createClient(url);
 
                                 try
                                 {
                                     let res = await new Promise<any>((resolve, reject) => {
                                         req.sendFile('', buildPath + module.name + '/' + module.name + ".pkg", (err, res, body) => {
-                                            if (err)
+                                            if (err) {
+                                                process.stdout.write(err.toString());
                                                 return reject(err);
+                                            }
 
                                             resolve(res);
                                         })
